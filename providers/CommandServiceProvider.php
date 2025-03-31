@@ -8,8 +8,6 @@ use Jsadways\LaravelSDK\Console\Commands\InstallSDK;
 use Jsadways\LaravelSDK\Console\Commands\MakeBase\InstallBaseClasses;
 use Jsadways\LaravelSDK\Console\Commands\MakeBase\InstallExampleClasses;
 use Jsadways\LaravelSDK\Console\Commands\MakeBase\InstallRoute;
-
-
 use Jsadways\LaravelSDK\Console\Commands\MakeClass\MakeClassController;
 use Jsadways\LaravelSDK\Console\Commands\MakeClass\MakeClassControllerContract;
 use Jsadways\LaravelSDK\Console\Commands\MakeClass\MakeClassRepository;
