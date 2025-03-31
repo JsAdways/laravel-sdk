@@ -29,7 +29,7 @@
     "require": {
         "jsadways/authenticator": "^1.0.0",
         "jsadways/data-api": "^1.0.0",
-        "jsadways/operationrecord": "*",
+        "jsadways/operationrecord": "^1.0.0",
         "jsadways/scopefilter": "^1.0.0"
     }
 }
