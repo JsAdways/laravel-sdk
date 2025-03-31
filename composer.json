@@ -26,5 +26,10 @@
             ]
         }
     },
-    "require": {}
+    "require": {
+        "Jsadways/authenticator": "^1.0",
+        "Jsadways/data-api": "^1.0",
+        "Jsadways/operationrecord": "*",
+        "Jsadways/scopefilter": "^1.0"
+    }
 }
