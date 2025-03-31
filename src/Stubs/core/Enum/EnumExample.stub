@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Core\Enums\Example;
+
+use Jsadways\LaravelSDK\Traits\EnumSerializer;
+use App\Core\Contracts\StaticSerializerContract;
+use Jsadways\LaravelSDK\TagProcessor\Tags\Description;
+
+enum Example: int implements StaticSerializerContract
+{
+    use EnumSerializer;
+
+    #[Description(name: '停用', style_class: 'danger')]
+    case off = 0;
+
+    #[Description(name: '啟用', style_class: 'success')]
+    case on = 1;
+}

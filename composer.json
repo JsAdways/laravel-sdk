@@ -1,0 +1,30 @@
+{
+    "name": "jsadways/laravel-sdk",
+    "type": "library",
+    "version": "1.0.1",
+    "autoload": {
+        "psr-4": {
+            "Jsadways\\LaravelSDK\\": "src/",
+            "Jsadways\\LaravelSDK\\Providers\\": "providers/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Js-Adways",
+            "email": "it@js-adways.com.tw"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Jsadways\\LaravelSDK\\Providers\\CommandServiceProvider",
+                "Jsadways\\LaravelSDK\\Providers\\ResponseMacroServiceProvider",
+                "Jsadways\\LaravelSDK\\Providers\\SDKServiceProvider"
+            ]
+        }
+    },
+    "require": {}
+}

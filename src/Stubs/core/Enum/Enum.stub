@@ -1,0 +1,13 @@
+<?php
+
+namespace {{ namespace }};
+
+use Jsadways\LaravelSDK\Traits\EnumSerializer;
+use App\Core\Contracts\StaticSerializerContract;
+use Jsadways\LaravelSDK\TagProcessor\Tags\Description;
+
+enum {{ class }}: int implements StaticSerializerContract
+{
+    use EnumSerializer;
+    {{ cases }}
+}

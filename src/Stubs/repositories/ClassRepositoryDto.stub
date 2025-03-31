@@ -1,0 +1,15 @@
+<?php
+
+namespace {{ namespace }};
+
+use Jsadways\LaravelSDK\Core\Dto;
+
+class {{ class }} extends Dto
+{
+    public function __construct(
+        {{ columns }}
+    )
+    {
+
+    }
+}

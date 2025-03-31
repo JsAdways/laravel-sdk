@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Core\Controllers\Example;
+
+use App\Http\Requests\ReadListRequest;
+use App\Http\Requests\Server\ServerRequest as Request;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+interface ExampleContract
+{
+    // example controller interface
+    public function create(Request $request): Model;
+    public function update(Request $request): Model;
+    public function read_list(ReadListRequest $request): LengthAwarePaginator|Collection;
+}

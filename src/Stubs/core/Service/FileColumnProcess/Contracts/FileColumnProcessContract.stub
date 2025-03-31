@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Core\Services\FileColumnProcess\Contracts;
+
+use Illuminate\Database\Eloquent\Model;
+
+interface FileColumnProcessContract
+{
+    //新增資料
+    public function create(array $payload,String $model):array;
+    //編輯資料
+    public function update(array $payload,String $model,array $db_data):array;
+    //刪除資料
+    public function delete(String $model,array $db_data):void;
+}

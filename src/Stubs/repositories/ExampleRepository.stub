@@ -1,0 +1,9 @@
+<?php
+
+namespace App\Repositories;
+use Jsadways\LaravelSDK\Repositories\Repository;
+
+class ExampleRepository extends Repository
+{
+    public array $__read_relations__ = ['A_list', 'B_list.product_item','C_list','D_list'];
+}

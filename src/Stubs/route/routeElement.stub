@@ -1,0 +1,7 @@
+    # {{ comment }}
+    Route::prefix('{{ class }}')->controller({{ controller }}Controller::class)->group(function()
+    {
+        Route::get('/', 'read_list');
+        Route::post('/', 'create');
+        Route::put('/', 'update');
+    });

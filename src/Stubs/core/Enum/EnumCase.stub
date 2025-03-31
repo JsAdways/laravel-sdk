@@ -1,0 +1,3 @@
+
+    #[Description(name: '', style_class: '')]
+    case {{ case }} = {{ index }};

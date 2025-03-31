@@ -1,0 +1,9 @@
+<?php
+
+namespace App\Managers;
+use Jsadways\LaravelSDK\Managers\Manager;
+
+class ExampleManager extends Manager
+{
+    protected string $__root__ = "THE CLASS ROOT PATH, CAN DEFINE IN CORE/CONSTS";
+}

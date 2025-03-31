@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Repositories;
+
+class {{ class }} extends Repository
+{
+    public array $__read_relations__ = [];
+    public array $__optional_relations__ = [];
+    public array $__delete_relations__ = [];
+}

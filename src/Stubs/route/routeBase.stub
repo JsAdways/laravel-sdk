@@ -1,0 +1,10 @@
+    /** 取得設定資料 */
+    Route::get('/config', [ConfigController::class, 'get']);
+    Route::get('/enums', [InternalController::class, 'get_enums']);
+    /** END設定資料 */
+
+    /** 處理上傳檔案快取 */
+    Route::post('/file_upload', [FileUploadController::class, 'cache']);
+    /** END處理上傳檔案 */
+
+

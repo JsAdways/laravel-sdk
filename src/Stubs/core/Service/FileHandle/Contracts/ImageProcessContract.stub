@@ -1,0 +1,11 @@
+<?php
+
+namespace App\Core\Services\FileHandle\Contracts;
+
+use Illuminate\Http\UploadedFile;
+
+interface ImageProcessContract
+{
+    //圖片檔處理
+    public function make(UploadedFile $file):UploadedFile;
+}

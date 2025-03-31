@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Services\Example;
+use Jsadways\LaravelSDK\Services\Service;
+
+class ExampleService extends Service
+{
+    public function __construct(){
+    }
+}
