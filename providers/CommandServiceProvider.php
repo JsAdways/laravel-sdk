@@ -39,7 +39,6 @@ class CommandServiceProvider extends ServiceProvider
                 InstallBaseClasses::class,
                 InstallExampleClasses::class,
                 InstallRoute::class,
-
                 MakeClassController::class,
                 MakeClassControllerContract::class,
                 MakeClassRepository::class,
