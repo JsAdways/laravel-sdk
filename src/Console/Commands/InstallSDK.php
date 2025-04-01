@@ -13,6 +13,9 @@ class InstallSDK extends Command
     public function handle()
     {
         try{
+            $this->call('vendor:publish',[
+                '--provider' => 'Js\Authenticator\Providers\AuthServiceProvider'
+            ]);
             $this->call('install:base-classes');
             $this->call('install:example-classes');
             $this->call('install:route');
