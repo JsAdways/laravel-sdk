@@ -28,6 +28,9 @@ class InstallBaseClasses extends BaseMakeCommand
         'exceptions/BaseException' =>[
             'path' => 'Exceptions/BaseException'
         ],
+        'exceptions/Handler' =>[
+            'path' => 'Exceptions/Handler'
+        ],
         # Repository
         'repositories/BaseRepository' =>[
             'path' => 'Repositories/Repository'
