@@ -4,6 +4,7 @@ namespace Jsadways\LaravelSDK\Console\Commands\MakeClass;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use JetBrains\PhpStorm\Pure;
 use Jsadways\LaravelSDK\Console\Commands\Traits\stub_files;
 use Jsadways\LaravelSDK\Core\Manager\GetObjectDto;
 use Jsadways\LaravelSDK\Managers\ModelManager;
@@ -74,7 +75,6 @@ class MakeTest extends Command
 
         # 生成常數
         $consts_stub = File::get($this->_prepare_stub_file("test/_consts"));
-        //$consts_stub = file_get_contents(base_path("stubs/test/_consts.stub"));
         $consts_fields = [
             'namespace' => $namespace,
             'api' => "{$api}",
@@ -85,7 +85,6 @@ class MakeTest extends Command
         # 生成測試
         $_action = strToLower($action);
         $test_stub = File::get($this->_prepare_stub_file("test/{$_action}"));
-        //$test_stub = file_get_contents(base_path("stubs/test/{$_action}.stub"));
         $test_fields = [
             'namespace' => $namespace,
             'group_name' => $group_name ?? $table_name,
@@ -108,7 +107,7 @@ class MakeTest extends Command
         }
     }
 
-    protected function _gen_file($stub, $file_path, ...$columns)
+    protected function _gen_file($stub, $file_path, ...$columns): void
     {
         # 生成替換內容清單 -> ['{{ columnA }}' => 'valueA', ...]
         $content_mapping = [];
@@ -122,7 +121,6 @@ class MakeTest extends Command
 
         # 將替換內容放入文件
         File::put($file_path, $content);
-        //file_put_contents($file_path, $content);
     }
 
     protected function _get_model(ModelManager $model_manager, string $model_class): BaseModel
@@ -149,7 +147,7 @@ class MakeTest extends Command
         return $result;
     }
 
-    protected function _make_payload(BaseModel $model)
+    protected function _make_payload(BaseModel $model): string
     {
         # return "['keyA' => 'valueA', 'keyB' => 'valueB', 'keyC' => 'valueC', ...]"
         $pattern = '';
@@ -187,9 +185,11 @@ class MakeTest extends Command
 
     protected function _fit_string_length(int|null $length): int|null
     {
+        # 長度超過30只處理30個字
         return ($length !== null && $length > 30) ? 30:$length;
     }
 
+    #[Pure]
     protected function _get_table_name(BaseModel $model): string
     {
         return $model->get_table_name();

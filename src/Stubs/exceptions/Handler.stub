@@ -47,8 +47,8 @@ class Handler extends ExceptionHandler
     {
         // 覆寫 ValidationException 轉換為 CustomValidationException
         $this->renderable(function (ValidationException $e) {
-            $error_meassage = $e->validator->errors()->getMessages();
-            return Response::fail(current(reset($error_meassage)));
+            $error_message = $e->validator->errors()->getMessages();
+            return Response::fail(current(reset($error_message)));
         });
 
         // 非預期錯誤
