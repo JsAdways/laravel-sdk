@@ -72,6 +72,10 @@ class MakeTest extends Command
         $model_root = $model_manager->get_root()."{$model_class}";
         $api = $api ?? "/api/{$table_name}";
         $example_payload = $this->_gen_example_payload($_model, $data_count);
+        [$assert_success_column,$column_type,$column_length] = $this->_get_first_required_string_column($_model);
+        $not_null_columns = $this->_get_not_null_columns($_model,3);
+        $update_column = $assert_success_column;
+        $update_data = $this->_gen_faker_date(type:$column_type,name:$update_column,length: $this->_fit_string_length($column_length));
 
         # 生成常數
         $consts_stub = File::get($this->_prepare_stub_file("test/_consts"));
@@ -94,6 +98,10 @@ class MakeTest extends Command
             'example_payload' => $example_payload,
             'table_name' => $table_name,
             'data_count' => $data_count,
+            'assert_success_column' => $assert_success_column,
+            'not_null_columns' => $not_null_columns,
+            'update_column' => $update_column,
+            'update_data' => $update_data
         ];
         $this->_gen_file($test_stub, $directory."/{$class_name}.php", ...$test_fields);
         $this->info("Test File {$class_name} generated successfully.");
@@ -189,6 +197,53 @@ class MakeTest extends Command
     {
         # 長度超過30只處理30個字
         return ($length !== null && $length > 30) ? 30:$length;
+    }
+
+    protected function _get_first_required_string_column(BaseModel $model): array
+    {
+        $first_string_column = "";
+        $return_column_type = "";
+        $return_column_length = null;
+        foreach ($model->get_table_info() as $info)
+        {
+            if($info->required && $this->_match_column_type($info->type) === 'string')
+            {
+                $first_string_column = $info->name;
+                $return_column_type = $info->type;
+                $return_column_length = $info->length;
+                break;
+            }
+        }
+        if($first_string_column === ""){
+            foreach ($model->get_table_info() as $info)
+            {
+                if($info->required && $info->name !== 'id')
+                {
+                    $first_string_column = $info->name;
+                    $return_column_type = $info->type;
+                    break;
+                }
+            }
+        }
+        return [$first_string_column,$return_column_type,$return_column_length];
+    }
+
+    protected function _get_not_null_columns(BaseModel $model,int $count = 3): string
+    {
+        $not_null_columns = [];
+
+        foreach ($model->get_table_info() as $info)
+        {
+            if(!$info->required && $info->name !== 'created_at' && $info->name !== 'updated_at')
+            {
+                $not_null_columns[] = $info->name;
+            }
+            if(count($not_null_columns) >= $count)
+            {
+                break;
+            }
+        }
+        return  "['" . implode("', '", $not_null_columns) . "']";
     }
 
     #[Pure]

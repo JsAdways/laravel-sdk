@@ -40,10 +40,10 @@ class {{ class_name }} extends TestCase
     public function test_correct_data(): void
     {
         //Arrange
-        $department_data = $this->_make_model();
-        $name = '測試部門';
-        $payload = $department_data->toArray();
-        $payload['name'] = $name;
+        $created_data = $this->_make_model();
+        $update_value = '{{ update_data }}';
+        $payload = $created_data->toArray();
+        $payload['{{ update_column }}'] = $update_value;
 
         // Act
         $response = $this->putJson($this::URL, $payload);
@@ -52,8 +52,8 @@ class {{ class_name }} extends TestCase
         $response
         ->assertStatus(200)
         ->assertJsonStructure(['data'])
-        ->assertJsonPath('data.name', $name);
+        ->assertJsonPath('data.{{ update_column }}', $update_value);
 
-        $this->assertDatabaseHas('{{ table_name }}', ['name' => $payload['name']]);
+        $this->assertDatabaseHas('{{ table_name }}', ['{{ update_column }}' => $payload['{{ update_column }}']]);
     }
 }
