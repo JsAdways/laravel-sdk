@@ -1,0 +1,87 @@
+<?php
+
+namespace {{ namespace }};
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+/**
+ * @group {{ group_name }}
+ */
+class {{ class_name }} extends TestCase
+{
+    use RefreshDatabase;
+    const URL = _Consts::URL;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    private function _generate_payload(): array
+    {
+        return {{ example_payload }};
+    }
+
+    /**
+     * 如無查詢條件將取得所有資料
+     *
+     * @group {{ group_name }}
+     */
+    public function test_create_success(): void
+    {
+        //Arrange
+        $payload = $this->_generate_payload();
+
+        // Act
+        $response = $this->postJson($this::URL, $payload);
+
+        // Assert
+        $response
+        ->assertStatus(200)
+        ->assertJsonStructure(['data'])
+        ->assertJsonPath('data.name', $payload['name']);
+
+        $this->assertDatabaseHas('{{ table_name }}', ['name' => $payload['name']]);
+    }
+
+    /**
+     * @dataProvider invalid_data
+     */
+    public function test_incorrect_data(array $data): void
+    {
+        //Arrange
+        $payload = $this->_generate_payload();
+        foreach($data['field'] as $key => $value) {
+            $payload[$key] = $value;
+        }
+
+        // Act
+        $response = $this->postJson($this::URL, $payload);
+
+        // Assert
+        $response
+        ->assertStatus(400)
+        ->assertJsonPath('message', $data['error_msg']);
+    }
+
+    public static function invalid_data(): array
+    {
+        $not_null_columns = ['name', 'status', 'creator_id'];
+        $not_null_validate = [];
+        foreach($not_null_columns as $column){
+            $field = preg_replace('/_/', ' ', $column);
+            $not_null_validate["缺少 {$column} 欄位"] = [
+                [
+                    'field' => ["{$column}" => null],
+                    'error_msg' => "The {$field} field is required.",
+                ]
+            ];
+        }
+
+        return [
+            ...$not_null_validate,
+            # 其他測試案例自行新增
+        ];
+    }
+}

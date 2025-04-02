@@ -1,0 +1,9 @@
+<?php
+
+namespace {{ namespace }};
+
+class _Consts
+{
+    const URL = '{{ api }}';
+    const MAIN_MODEL = \App\Models\{{ model_class }}::class;
+}

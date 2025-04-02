@@ -2,9 +2,12 @@
 
 namespace Jsadways\LaravelSDK\Models;
 
+use Jsadways\LaravelSDK\Models\_Column;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Jsadways\ScopeFilter\ScopeFilterTrait;
+use Iterator;
 
 abstract class BaseModel extends Model
 {
@@ -22,6 +25,27 @@ abstract class BaseModel extends Model
     {
         return $this->table;
     }
+
+    /** @return Iterator<_Column> */
+    public function get_table_info(): iterable
+    {
+        $columns = DB::select(
+            "
+            SELECT
+            COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT, IS_NULLABLE,CHARACTER_MAXIMUM_LENGTH,
+            CASE WHEN IS_NULLABLE = 'NO' THEN 1 ELSE 0 END AS REQUIRED
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE
+            TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+            ",
+            [$this->table]
+        );
+        foreach ($columns as $column)
+        {
+            yield new _Column($column->COLUMN_NAME, $column->DATA_TYPE, $column->CHARACTER_MAXIMUM_LENGTH, $column->COLUMN_COMMENT, $column->REQUIRED);
+        }
+    }
+
 
     # 返回 Model 的完整驗證內容
     abstract protected function _schema(): array;

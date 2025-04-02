@@ -1,0 +1,56 @@
+<?php
+
+namespace {{ namespace }};
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use {{ model_root }};
+
+/**
+ * @group {{ group_name }}
+ */
+class {{ class_name }} extends TestCase
+{
+    use RefreshDatabase;
+    const URL = _Consts::URL;
+    const MODEL = _Consts::MAIN_MODEL;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    /**
+     * 建立資料
+     *
+     * @return {{ model_class }}
+     */
+    private function _make_model(): {{ model_class }}
+    {
+        return $this::MODEL::create(
+            {{ example_payload }}
+        );
+    }
+
+    /**
+     * 刪除
+     *
+     * @return void
+     */
+    public function test_correct_data(): void
+    {
+        //Arrange
+        $model = $this->_make_model();
+        $payload = ['id' => $model->id];
+
+        // Act
+        $response = $this->deleteJson(self::URL, $payload);
+
+        // Assert
+        $response
+        ->assertStatus(200)
+        ->assertJsonStructure(['data']);
+
+        $this->assertModelMissing($model);
+    }
+}

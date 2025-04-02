@@ -32,6 +32,9 @@ class CodeInit extends Command
                     'name' => $this->create_dir.$table['name'],
                     'comment' => $table['comment']
                 ]);
+                $this->call("app:gen-test",[
+                    '--model_class' => $table_name
+                ]);
             }
         }else{
             $this->error('Dir argument not allow!!');

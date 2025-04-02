@@ -15,6 +15,7 @@ use Jsadways\LaravelSDK\Console\Commands\MakeClass\MakeClassRepositoryDto;
 use Jsadways\LaravelSDK\Console\Commands\MakeClass\MakeClassModel;
 use Jsadways\LaravelSDK\Console\Commands\MakeClass\MakeClassEnum;
 use Jsadways\LaravelSDK\Console\Commands\MakeClass\MakeRoute;
+use Jsadways\LaravelSDK\Console\Commands\MakeClass\MakeTest;
 use Jsadways\LaravelSDK\Console\Commands\GenerateApiDocs;
 
 class CommandServiceProvider extends ServiceProvider
@@ -44,6 +45,7 @@ class CommandServiceProvider extends ServiceProvider
                 MakeClassModel::class,
                 MakeClassEnum::class,
                 MakeRoute::class,
+                MakeTest::class,
                 InstallSDK::class,
                 CodeInit::class,
                 GenerateApiDocs::class

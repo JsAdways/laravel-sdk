@@ -1,0 +1,59 @@
+<?php
+
+namespace {{ namespace }};
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use {{ model_root }};
+
+/**
+ * @group {{ group_name }}
+ */
+class {{ class_name }} extends TestCase
+{
+    use RefreshDatabase;
+    const URL = _Consts::URL;
+    const MODEL = _Consts::MAIN_MODEL;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    /**
+     * 建立資料
+     *
+     * @return {{ model_class }}
+     */
+    private function _make_model(): {{ model_class }}
+    {
+        return $this::MODEL::create(
+            {{ example_payload }}
+        );
+    }
+
+    /**
+     * 更新
+     *
+     * @return void
+     */
+    public function test_correct_data(): void
+    {
+        //Arrange
+        $department_data = $this->_make_model();
+        $name = '測試部門';
+        $payload = $department_data->toArray();
+        $payload['name'] = $name;
+
+        // Act
+        $response = $this->putJson($this::URL, $payload);
+
+        // Assert
+        $response
+        ->assertStatus(200)
+        ->assertJsonStructure(['data'])
+        ->assertJsonPath('data.name', $name);
+
+        $this->assertDatabaseHas('{{ table_name }}', ['name' => $payload['name']]);
+    }
+}

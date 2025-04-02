@@ -1,0 +1,84 @@
+<?php
+
+namespace {{ namespace }};
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+/**
+ * @group {{ group_name }}
+ */
+class {{ class_name }} extends TestCase
+{
+    use RefreshDatabase;
+    const URL = _Consts::URL;
+    const TOTAL = {{ data_count }};
+    const MODEL = _Consts::MAIN_MODEL;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
+
+    /**
+     * 建立資料
+     */
+    private function _make_model(): void
+    {
+        $payload = {{ example_payload }};
+        foreach ($payload as $data)
+        {
+            $this::MODEL::create($data);
+        }
+    }
+
+    /**
+     * 如無查詢條件將取得所有資料
+     *
+     * @return void
+     */
+    public function test_empty_filter(): void
+    {
+        //Arrange
+        $this->_make_model();
+
+        // Act
+        $response = $this->get($this::URL);
+
+        // Assert
+        $response->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'list' => [],
+                'page' => []
+            ]
+        ])
+        ->assertJsonPath('data.list', fn (array $data) => count($data) === $this::TOTAL);
+    }
+
+    /**
+     * 如有設定每頁取多少筆數資料，將進行分頁
+     *
+     * @return void
+     */
+    public function test_per_page_ge_0(): void
+    {
+        $count = $this::TOTAL - 1;
+        //Arrange
+        $this->_make_model();
+
+        // Act
+        $response = $this->get(self::URL."?per_page={$count}");
+
+        // Assert
+        $response->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
+                'list' => [],
+                'page' => []
+            ]
+        ])
+        ->assertJsonPath('data.list', fn (array $data) => count($data) === $count)  # 指定的數量
+        ->assertJsonPath('data.page.total', $this::TOTAL);  # 實際的數量
+    }
+}
