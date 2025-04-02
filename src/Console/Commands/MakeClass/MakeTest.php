@@ -180,6 +180,7 @@ class MakeTest extends Command
             $this->_match_column_type($type) === 'string' && $length >=5 => $this->faker->text($length),
             $this->_match_column_type($type) === 'string' && $length <5 => 'AA',
             $this->_match_column_type($type) === 'int' => $this->faker->numberBetween(1,3),
+            $this->_match_column_type($type) === 'date' => $this->faker->date,
             default => false
         };
     }
