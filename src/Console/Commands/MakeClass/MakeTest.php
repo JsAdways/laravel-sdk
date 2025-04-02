@@ -169,7 +169,8 @@ class MakeTest extends Command
         return match (true){
             str_ends_with($name,'_email') => $this->faker->email,
             str_ends_with($name,'address') => $this->faker->streetAddress,
-            $this->_match_column_type($type) === 'string' => $this->faker->text($length),
+            $this->_match_column_type($type) === 'string' && $length >=5 => $this->faker->text($length),
+            $this->_match_column_type($type) === 'string' && $length <5 => 'AA',
             $this->_match_column_type($type) === 'int' => $this->faker->numberBetween(1,3),
             default => false
         };
@@ -178,8 +179,9 @@ class MakeTest extends Command
     protected function _match_column_type(string $type): string
     {
         return match ($type){
-            'varchar','longtext','text' => 'string',
-            'tinyint','smallint','bigint','int' => 'int'
+            'tinyint','smallint','bigint','int','double' => 'int',
+            'date' => 'date',
+            default => 'string'
         };
     }
 
