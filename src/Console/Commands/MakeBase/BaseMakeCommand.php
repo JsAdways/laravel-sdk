@@ -15,25 +15,27 @@ class BaseMakeCommand extends Command
 
     public function handle()
     {
-        foreach($this->files_to_create as $file_name => $param){
-            $stubPath = $this->_prepare_stub_file($file_name);
-            $stub = File::get($stubPath);
+        foreach ($this->files_to_create as $base_path =>$files){
+            foreach ($files as $file_name => $param){
+                $stubPath = $this->_prepare_stub_file($file_name);
+                $stub = File::get($stubPath);
 
-            $filePath = $this->_getPath($param['path']);
-            $this->_makeDirectory($filePath);
+                $filePath = $this->_getPath($base_path,$param['path_method'],$param['path']);
+                $this->_makeDirectory($filePath);
 
-            File::put($filePath, $stub);
-            $this->info("File {$file_name} generated successfully.");
+                File::put($filePath, $stub);
+                $this->info("File {$file_name} generated successfully.");
+            }
         }
     }
 
-    protected function _getPath($fileName): string
+    protected function _getPath(string $base_path,string $path_method,string $fileName): string
     {
-        $path = implode("/",array_map("ucfirst",explode('/',$fileName)));
-        return app_path("{$path}.php");
+        $path = implode("/",array_map($path_method,explode('/',$fileName)));
+        return $base_path("{$path}.php");
     }
 
-    protected function _makeDirectory($path):void
+    protected function _makeDirectory(string $path):void
     {
         if (!File::isDirectory(dirname($path))) {
             File::makeDirectory(dirname($path), 0755, true, true);

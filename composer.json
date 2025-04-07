@@ -1,7 +1,7 @@
 {
     "name": "jsadways/laravel-sdk",
     "type": "library",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "autoload": {
         "psr-4": {
             "Jsadways\\LaravelSDK\\": "src/",
@@ -33,6 +33,7 @@
         "jsadways/scopefilter": "^1.0.0",
         "mavinoo/laravel-batch": "^2.4",
         "spatie/laravel-google-cloud-storage": "^2.3",
-        "intervention/image": "^3.10"
+        "intervention/image": "^3.10",
+        "symfony/filesystem": "^7.2"
     }
 }

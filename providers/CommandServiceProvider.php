@@ -5,6 +5,7 @@ namespace Jsadways\LaravelSDK\Providers;
 use Illuminate\Support\ServiceProvider;
 use Jsadways\LaravelSDK\Console\Commands\CodeInit;
 use Jsadways\LaravelSDK\Console\Commands\InstallSDK;
+use Jsadways\LaravelSDK\Console\Commands\RemoveSDK;
 use Jsadways\LaravelSDK\Console\Commands\MakeBase\InstallBaseClasses;
 use Jsadways\LaravelSDK\Console\Commands\MakeBase\InstallExampleClasses;
 use Jsadways\LaravelSDK\Console\Commands\MakeBase\InstallRoute;
@@ -47,6 +48,7 @@ class CommandServiceProvider extends ServiceProvider
                 MakeRoute::class,
                 MakeTest::class,
                 InstallSDK::class,
+                RemoveSDK::class,
                 CodeInit::class,
                 GenerateApiDocs::class
             ]);
