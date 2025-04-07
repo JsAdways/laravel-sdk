@@ -163,7 +163,7 @@ class MakeTest extends Command
         {
             if ($info->name !== 'id'){
                 if ($info->required) {
-                    $pattern .= "'{$info->name}' => '{$this->_gen_faker_date(type:$info->type,name:$info->name,length: $this->_fit_string_length($info->length))}',  # {$info->comment} \n";
+                    $pattern .= "'{$info->name}' => {$this->_gen_faker_date(type:$info->type,name:$info->name,length: $this->_fit_string_length($info->length))},  # {$info->comment} \n";
                 }else{
                     $pattern .= "'{$info->name}' => Null,  # {$info->comment} \n";
                 }
@@ -175,12 +175,12 @@ class MakeTest extends Command
     protected function _gen_faker_date(string $type, string $name, int|null $length):string | bool
     {
         return match (true){
-            str_ends_with($name,'_email') => $this->faker->email,
-            str_ends_with($name,'address') => $this->faker->streetAddress,
-            $this->_match_column_type($type) === 'string' && $length >=5 => $this->faker->text($length),
+            str_ends_with($name,'_email') => "'{$this->faker->email}'",
+            str_ends_with($name,'address') => "'{$this->faker->streetAddress}'",
+            $this->_match_column_type($type) === 'string' && $length >=5 => "'{$this->faker->text($length)}'",
             $this->_match_column_type($type) === 'string' && $length <5 => 'AA',
             $this->_match_column_type($type) === 'int' => $this->faker->numberBetween(1,3),
-            $this->_match_column_type($type) === 'date' => $this->faker->date,
+            $this->_match_column_type($type) === 'date' => "'{$this->faker->date}'",
             default => false
         };
     }

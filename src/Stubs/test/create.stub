@@ -42,7 +42,7 @@ class {{ class_name }} extends TestCase
         ->assertJsonStructure(['data'])
         ->assertJsonPath('data.{{ assert_success_column }}', $payload['{{ assert_success_column }}']);
 
-        $this->assertDatabaseHas('{{ table_name }}', ['name' => $payload['{{ assert_success_column }}']]);
+        $this->assertDatabaseHas('{{ table_name }}', ['{{ assert_success_column }}' => $payload['{{ assert_success_column }}']]);
     }
 
     /**

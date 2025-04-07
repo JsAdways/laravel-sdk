@@ -28,10 +28,10 @@ class CodeInit extends Command
                 $this->call("make:sdk-repository",[
                     'name' => $table_name."Repository"
                 ]);
-//                $this->call("make:sdk-route",[
-//                    'name' => $this->create_dir.$table['name'],
-//                    'comment' => $table['comment']
-//                ]);
+                $this->call("make:sdk-route",[
+                    'name' => $this->create_dir.$table['name'],
+                    'comment' => $table['comment']
+                ]);
                 $this->call("app:gen-test",[
                     '--model_class' => $table_name
                 ]);
