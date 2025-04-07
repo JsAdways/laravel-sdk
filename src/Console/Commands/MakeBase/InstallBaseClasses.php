@@ -56,7 +56,7 @@ class InstallBaseClasses extends BaseMakeCommand
         ],
         # Core
         'core/Consts' =>[
-            'path' => 'Core/Consts'
+            'path' => 'Core/_Consts'
         ],
         'core/Controller/ControllerExampleContract' => [
             'path' => 'Core/Controllers/Example/ExampleContract'

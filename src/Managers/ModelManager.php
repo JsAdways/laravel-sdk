@@ -2,12 +2,12 @@
 
 namespace Jsadways\LaravelSDK\Managers;
 
-use Jsadways\LaravelSDK\Core\Consts;
+use Jsadways\LaravelSDK\Core\_Consts;
 use Jsadways\LaravelSDK\Models\BaseModel;
 
 class ModelManager extends Manager
 {
-    protected string $__root__ = Consts::MODEL_ROOT;
+    protected string $__root__ = _Consts::MODEL_ROOT;
 
 
     /**

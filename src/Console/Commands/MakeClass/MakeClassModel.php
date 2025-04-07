@@ -47,10 +47,11 @@ class MakeClassModel extends BaseMakeClassCommand
     protected function _column_type_match(string $type): bool|string
     {
         return match (true){
-            str_starts_with($type,"bigint"),str_starts_with($type,"smallint"),str_starts_with($type,"int"),str_starts_with($type,"tinyint") => 'integer',
-            str_starts_with($type,"tinyint(2)") => 'boolean',
+            str_ends_with($type,'int'),str_ends_with($type,'int unsigned'),str_ends_with($type,'int signed') => 'integer',
+            str_starts_with($type,"tinyint(1)"),str_starts_with($type,"tinyint(2)") => 'boolean',
             str_starts_with($type,"varchar") => (preg_match('/\d+/',$type,$matches)) ? 'string|max:'.$matches[0]:'string',
             str_starts_with($type,"longtext") => 'array',
+            str_ends_with($type,"text") => 'string',
             str_starts_with($type,"date") => 'date',
             default => false
         };

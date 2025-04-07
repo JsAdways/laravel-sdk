@@ -1,7 +1,7 @@
 <?php
 namespace Jsadways\LaravelSDK\Http\Requests\Server\Picker;
 
-use Jsadways\LaravelSDK\Core\Consts;
+use Jsadways\LaravelSDK\Core\_Consts;
 use Jsadways\LaravelSDK\Http\Validation\Unit\Operator;
 use Jsadways\LaravelSDK\Http\Validation\Unit\Picker;
 use Jsadways\LaravelSDK\Http\Validation\Unit\Relation as ValidationRelation;
@@ -16,7 +16,7 @@ use ReflectionMethod;
 
 class BasePicker
 {
-    private string $__model_root__ = Consts::MODEL_ROOT;
+    private string $__model_root__ = _Consts::MODEL_ROOT;
     protected BaseModel $__model__;
     protected ModelManager $model_manager;
     protected array $_operator_map;

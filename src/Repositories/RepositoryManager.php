@@ -2,7 +2,7 @@
 
 namespace Jsadways\LaravelSDK\Repositories;
 
-use Jsadways\LaravelSDK\Core\Consts;
+use Jsadways\LaravelSDK\Core\_Consts;
 use Exception;
 
 final class RepositoryManager
@@ -17,7 +17,7 @@ final class RepositoryManager
     public function get(string $name): Repository
     {
         try {
-            $namespace = Consts::REPOSITORIES_ROOT;
+            $namespace = _Consts::REPOSITORIES_ROOT;
             $repository = "{$namespace}{$name}" . "Repository";
             return new $repository;
         } catch (Exception $exception) {

@@ -2,7 +2,7 @@
 
 namespace Jsadways\LaravelSDK\Repositories;
 
-use Jsadways\LaravelSDK\Core\Consts;
+use Jsadways\LaravelSDK\Core\_Consts;
 use ReflectionException;
 use Throwable;
 use Jsadways\LaravelSDK\Core\Dto;
@@ -31,7 +31,7 @@ class Repository
     protected array $__optional_relations__ = [];
     protected array $__delete_relations__ = [];
 
-    protected string $__model_root__ = Consts::MODEL_ROOT;
+    protected string $__model_root__ = _Consts::MODEL_ROOT;
     protected ?BaseModel $__model__ = Null;
 
     public function get_model(): BaseModel

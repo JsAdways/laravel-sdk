@@ -1,7 +1,7 @@
 <?php
 namespace Jsadways\LaravelSDK\Core;
 
-class Consts
+class _Consts
 {
     const MODEL_ROOT = 'App\\Models\\';
     const ENUM_ROOT = 'App\\Core\\Enums\\';

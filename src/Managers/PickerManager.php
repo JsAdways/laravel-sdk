@@ -1,13 +1,13 @@
 <?php
 namespace Jsadways\LaravelSDK\Managers;
 
-use Jsadways\LaravelSDK\Core\Consts;
+use Jsadways\LaravelSDK\Core\_Consts;
 use Jsadways\LaravelSDK\Core\Manager\GetObjectDto;
 use Jsadways\LaravelSDK\Exceptions\BaseException;
 
 class PickerManager extends Manager
 {
-    protected string $__root__ = Consts::PICKER_ROOT;
+    protected string $__root__ = _Consts::PICKER_ROOT;
     protected GetObjectDto $process_data;
     public function __construct(string $model_name,string $method_name)
     {

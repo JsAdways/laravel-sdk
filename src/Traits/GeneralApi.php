@@ -2,7 +2,7 @@
 
 namespace Jsadways\LaravelSDK\Traits;
 
-use Jsadways\LaravelSDK\Core\Consts;
+use Jsadways\LaravelSDK\Core\_Consts;
 use Jsadways\LaravelSDK\TagProcessor\Tags\PreCallAction;
 use Jsadways\LaravelSDK\Core\ReadListParamsDto;
 use Jsadways\LaravelSDK\Exceptions\RepositoryException;
@@ -22,10 +22,10 @@ trait GeneralApi
     use UseRepository;
 
     // Server Model Path
-    private string $__model_root__ = Consts::MODEL_ROOT;
+    private string $__model_root__ = _Consts::MODEL_ROOT;
 
     // Server Dto Path
-    private string $__dto_root__ = Consts::REPOSITORY_ROOT;
+    private string $__dto_root__ = _Consts::REPOSITORY_ROOT;
 
     // Controller Main Model. (set Example if ExampleController)
     private BaseModel|Authenticatable $__main_model__;
