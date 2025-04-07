@@ -64,7 +64,7 @@ class MakeTest extends Command
         $this->_gen_directory($directory);
 
         # 內容參數
-        $_model = $this->_get_model($model_manager, strtolower($model_class));
+        $_model = $this->_get_model($model_manager, $model_class);
         $namespace = "Tests\Feature"."\\{$model_class}";
         $class_name = "{$action}{$model_class}Test";
         $table_name = $this->_get_table_name($_model);

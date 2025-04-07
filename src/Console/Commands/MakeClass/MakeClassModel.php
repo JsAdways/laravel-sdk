@@ -51,6 +51,7 @@ class MakeClassModel extends BaseMakeClassCommand
             str_starts_with($type,"tinyint(2)") => 'boolean',
             str_starts_with($type,"varchar") => (preg_match('/\d+/',$type,$matches)) ? 'string|max:'.$matches[0]:'string',
             str_starts_with($type,"longtext") => 'array',
+            str_starts_with($type,"date") => 'date',
             default => false
         };
     }
