@@ -48,6 +48,7 @@ class MakeClassModel extends BaseMakeClassCommand
     {
         return match (true){
             str_ends_with($type,'int'),str_ends_with($type,'int unsigned'),str_ends_with($type,'int signed') => 'integer',
+            str_ends_with($type,'double'),str_ends_with($type,'double unsigned'),str_ends_with($type,'double signed') => 'numeric',
             str_starts_with($type,"tinyint(1)"),str_starts_with($type,"tinyint(2)") => 'boolean',
             str_starts_with($type,"varchar") => (preg_match('/\d+/',$type,$matches)) ? 'string|max:'.$matches[0]:'string',
             str_starts_with($type,"longtext") => 'array',

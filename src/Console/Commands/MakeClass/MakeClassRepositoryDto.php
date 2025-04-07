@@ -12,7 +12,7 @@ class MakeClassRepositoryDto extends BaseMakeClassCommand
     protected $name = 'make:sdk-repository-dto';
     protected $description = 'Create sdk repository dto class';
     protected string $stub_path = 'repositories/ClassRepositoryDto';
-    protected string $base_target_path = '\Core\repositories';
+    protected string $base_target_path = '\Core\Repositories';
     protected string $target_path = '';
     protected array $replace_tags = [];
 
@@ -55,6 +55,7 @@ class MakeClassRepositoryDto extends BaseMakeClassCommand
     {
         return match (true){
             str_ends_with($type,'int'),str_ends_with($type,'int unsigned'),str_ends_with($type,'int signed') => 'int',
+            str_ends_with($type,'double'),str_ends_with($type,'double unsigned'),str_ends_with($type,'double signed') => 'float',
             str_starts_with($type,"tinyint(1)"),str_starts_with($type,"tinyint(2)") => 'bool',
             str_starts_with($type,"varchar") ,str_ends_with($type,"text"),str_starts_with($type,"date") => 'string',
             default => false

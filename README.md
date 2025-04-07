@@ -79,6 +79,22 @@ GOOGLE_CLOUD_STORAGE_API_URI=
 2. InternalService #取得Enums資料
 3. FileColumnProcessService #針對Create Update Delete處理相對應的檔案
 
+## 資料生成內容
+1. app/Core/Controllers/TABLE_NAME/TABLE_NAMEContract.php  
+   Interface : 規範controller該有的method，預設生成create、read_list、Update  
+2. app/Core/Repositories/TABLE_NAME/Dtos/{Create/Update}TABLE_NAMEDto.php
+   建立/更新資料所需傳入的Dto物件，內容為資料表的所有欄位
+3. app/Exceptions/BaseException.php  
+   基礎錯誤，可繼承BaseException後自行定義其他錯誤內容  
+4. app/Http/Controllers/{API}/TABLE_NAMEController.php  
+   處理業務邏輯的controller，預設繼承app/Http/Controllers/Controller.php，擁有Create、Update、Read_list、Delete 等method  
+5. app/Models/TABLE_NAME.php  
+   資料表的model檔案，包含_schema() method，用於定義每個欄位驗證格式，可以照需求調整  
+6. app/Repositories/TABLE_NAMERepository.php  
+   預設擁有Create、Update、Read_list、Delete 等method，可自行定義read、optional、delete，三個relation name，讓repository執行對應method時可以將relation資料也一起處理  
+7. tests/Feature/TABLE_NAME/{Create/Delete/Read/Update}TABEL_NAMETest.php  
+   產稱CRUD基礎測試內容，並放入假資料，請再依照實際內容修改
+
 ## 提供資料生成指令
 Create Controller
 ```
@@ -110,6 +126,16 @@ php artisan make:sdk-enum Member/Status --cases=On,Off
 #生成 app/Core/Enums/Member/Status.php
  需要再手動修改檔案中每個case的Description與style_class屬性
 ```
+Create Test  
+```
+php artisan app:gen-test
+{--action= : 想要測試的行為，目前提供 [All(預設全部), Create, Update, Delete, Read]。}
+{--model_class= : 想要測試的 Model 名稱。}
+{--group_name= : 測試組別名稱。}
+{--api= : 測試的 API 名稱。}
+
+#生成 tests/Feature/ 測試檔案
+```
 Create API Documents
 ```
 php artisan app:docs
@@ -118,3 +144,9 @@ php artisan app:docs
  在<http://PROJECT_URL/docs-api>此路徑中可查閱文件內容
 ```
 
+## 移除SDK套件內容
+```
+php artisan laravel-sdk:remove
+
+#檔案資料恢復到原生的Laravel資料夾結構
+```
