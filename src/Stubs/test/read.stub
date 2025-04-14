@@ -81,4 +81,25 @@ class {{ class_name }} extends TestCase
         ->assertJsonPath('data.list', fn (array $data) => count($data) === $count)  # 指定的數量
         ->assertJsonPath('data.page.total', $this::TOTAL);  # 實際的數量
     }
+
+    /**
+     * 不定義每頁數量
+     *
+     * @return void
+     */
+    public function test_no_per_page(): void
+    {
+        //Arrange
+        $this->_make_model();
+
+        // Act
+        $response = $this->withoutMiddleware()->get(self::URL."?per_page=0");
+
+        // Assert
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => []
+            ]);
+
+    }
 }
