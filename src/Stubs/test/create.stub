@@ -20,7 +20,7 @@ class {{ class_name }} extends TestCase
 
     private function _generate_payload(): array
     {
-        return {{ example_payload }};
+        return _Consts::CREATE_DATA;
     }
 
     /**
@@ -34,7 +34,7 @@ class {{ class_name }} extends TestCase
         $payload = $this->_generate_payload();
 
         // Act
-        $response = $this->postJson($this::URL, $payload);
+        $response = $this->withoutMiddleware()->postJson($this::URL, $payload);
 
         // Assert
         $response
@@ -53,11 +53,23 @@ class {{ class_name }} extends TestCase
         //Arrange
         $payload = $this->_generate_payload();
         foreach($data['field'] as $key => $value) {
-            $payload[$key] = $value;
+            if(str_contains($key,'.')){
+                $target = &$payload;
+                $columns = explode('.',$key);
+                foreach ($columns as $index=>$column) {
+                    if($index === count($columns)-1){
+                        $target[$column] = $value;
+                        break;
+                    }
+                    $target = &$target[$column];
+                }
+            }else{
+                $payload[$key] = $value;
+            }
         }
 
         // Act
-        $response = $this->postJson($this::URL, $payload);
+        $response = $this->withoutMiddleware()->postJson($this::URL, $payload);
 
         // Assert
         $response

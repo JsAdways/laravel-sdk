@@ -68,7 +68,7 @@ class MakeTest extends Command
         $namespace = "Tests\Feature"."\\{$model_class}";
         $class_name = "{$action}{$model_class}Test";
         $table_name = $this->_get_table_name($_model);
-        $data_count = $action === 'Read' ? 3 : 1;  # read 使用
+        $data_count = 1;  # read 使用
         $model_root = $model_manager->get_root()."{$model_class}";
         $api = $api ?? "/api/{$table_name}";
         $example_payload = $this->_gen_example_payload($_model, $data_count);
@@ -82,7 +82,8 @@ class MakeTest extends Command
         $consts_fields = [
             'namespace' => $namespace,
             'api' => "{$api}",
-            'model_class' => $model_class
+            'model_class' => $model_class,
+            'example_payload' => $example_payload
         ];
         $this->_gen_file($consts_stub, $directory."/_Consts.php", ...$consts_fields);
 
@@ -101,7 +102,7 @@ class MakeTest extends Command
             'assert_success_column' => $assert_success_column,
             'not_null_columns' => $not_null_columns,
             'update_column' => $update_column,
-            'update_data' => $update_data
+            //'update_data' => $update_data
         ];
         $this->_gen_file($test_stub, $directory."/{$class_name}.php", ...$test_fields);
         $this->info("Test File {$class_name} generated successfully.");
@@ -235,7 +236,7 @@ class MakeTest extends Command
 
         foreach ($model->get_table_info() as $info)
         {
-            if(!$info->required && $info->name !== 'created_at' && $info->name !== 'updated_at')
+            if($info->required && $info->name !== 'id' && $info->name !== 'created_at' && $info->name !== 'updated_at')
             {
                 $not_null_columns[] = $info->name;
             }

@@ -44,7 +44,7 @@ class {{ class_name }} extends TestCase
         $payload = ['id' => $model->id];
 
         // Act
-        $response = $this->deleteJson(self::URL, $payload);
+        $response = $this->withoutMiddleware()->deleteJson(self::URL, $payload);
 
         // Assert
         $response

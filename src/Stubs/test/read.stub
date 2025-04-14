@@ -25,7 +25,7 @@ class {{ class_name }} extends TestCase
      */
     private function _make_model(): void
     {
-        $payload = {{ example_payload }};
+        $payload = [_Consts::CREATE_DATA];
         foreach ($payload as $data)
         {
             $this::MODEL::create($data);
@@ -43,7 +43,7 @@ class {{ class_name }} extends TestCase
         $this->_make_model();
 
         // Act
-        $response = $this->get($this::URL);
+        $response = $this->withoutMiddleware()->get($this::URL);
 
         // Assert
         $response->assertStatus(200)
@@ -68,7 +68,7 @@ class {{ class_name }} extends TestCase
         $this->_make_model();
 
         // Act
-        $response = $this->get(self::URL."?per_page={$count}");
+        $response = $this->withoutMiddleware()->get(self::URL."?per_page={$count}");
 
         // Assert
         $response->assertStatus(200)

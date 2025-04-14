@@ -6,4 +6,5 @@ class _Consts
 {
     const URL = '{{ api }}';
     const MAIN_MODEL = \App\Models\{{ model_class }}::class;
+    const CREATE_DATA = {{ example_payload }};
 }

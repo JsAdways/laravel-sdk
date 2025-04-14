@@ -27,9 +27,17 @@ class {{ class_name }} extends TestCase
      */
     private function _make_model(): {{ model_class }}
     {
-        return $this::MODEL::create(
-            {{ example_payload }}
-        );
+        return $this::MODEL::create(_Consts::CREATE_DATA);
+    }
+
+    /**
+     * 要更新的資料
+     *
+     * @return array
+     */
+    private function _generate_update_payload(): array
+    {
+        return {{ example_payload }};
     }
 
     /**
@@ -41,18 +49,16 @@ class {{ class_name }} extends TestCase
     {
         //Arrange
         $created_data = $this->_make_model();
-        $update_value = '{{ update_data }}';
-        $payload = $created_data->toArray();
-        $payload['{{ update_column }}'] = $update_value;
+        $payload = $this->_generate_update_payload();
 
         // Act
-        $response = $this->putJson($this::URL, $payload);
+        $response = $this->withoutMiddleware()->putJson($this::URL, $payload);
 
         // Assert
         $response
         ->assertStatus(200)
         ->assertJsonStructure(['data'])
-        ->assertJsonPath('data.{{ update_column }}', $update_value);
+        ->assertJsonPath('data.{{ update_column }}', $payload['{{ update_column }}']);
 
         $this->assertDatabaseHas('{{ table_name }}', ['{{ update_column }}' => $payload['{{ update_column }}']]);
     }
