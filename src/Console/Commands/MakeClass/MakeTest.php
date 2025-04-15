@@ -68,10 +68,11 @@ class MakeTest extends Command
         $namespace = "Tests\Feature"."\\{$model_class}";
         $class_name = "{$action}{$model_class}Test";
         $table_name = $this->_get_table_name($_model);
-        $data_count = 1;  # read 使用
+        $data_count = $action === 'Read' ? 3 : 1;  # read 使用
         $model_root = $model_manager->get_root()."{$model_class}";
         $api = $api ?? "/api/{$table_name}";
-        $example_payload = $this->_gen_example_payload($_model, $data_count);
+        $example_payload = $this->_gen_example_payload($_model, 1);
+        $list_payload = $this->_gen_example_payload($_model, 3);
         [$assert_success_column,$column_type,$column_length] = $this->_get_first_required_string_column($_model);
         $not_null_columns = $this->_get_not_null_columns($_model,3);
         $update_column = $assert_success_column;
@@ -83,7 +84,8 @@ class MakeTest extends Command
             'namespace' => $namespace,
             'api' => "{$api}",
             'model_class' => $model_class,
-            'example_payload' => $example_payload
+            'example_payload' => $example_payload,
+            'list_payload' => $list_payload,
         ];
         $this->_gen_file($consts_stub, $directory."/_Consts.php", ...$consts_fields);
 
