@@ -28,7 +28,7 @@ class {{ class_name }} extends TestCase
         $payload = _Consts::LIST_DATA;
         foreach ($payload as $data)
         {
-            $this::MODEL::create($data);
+            $this->withoutMiddleware()->postJson($this::URL, $data);
         }
     }
 
