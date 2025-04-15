@@ -238,7 +238,7 @@ class MakeTest extends Command
 
         foreach ($model->get_table_info() as $info)
         {
-            if($info->required && $info->name !== 'id' && $info->name !== 'created_at' && $info->name !== 'updated_at')
+            if($info->required && str_ends_with($info->name,'_id') && $info->name !== 'id' && $info->name !== 'created_at' && $info->name !== 'updated_at')
             {
                 $not_null_columns[] = $info->name;
             }
