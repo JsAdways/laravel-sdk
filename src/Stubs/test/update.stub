@@ -48,7 +48,7 @@ class {{ class_name }} extends TestCase
     public function test_correct_data(): void
     {
         //Arrange
-        $created_data = $this->_make_model();
+        $this->_make_model();
         $payload = $this->_generate_update_payload();
 
         // Act
