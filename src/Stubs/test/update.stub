@@ -4,7 +4,7 @@ namespace {{ namespace }};
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use {{ model_root }};
+use Illuminate\Testing\TestResponse;
 
 /**
  * @group {{ group_name }}
@@ -23,11 +23,11 @@ class {{ class_name }} extends TestCase
     /**
      * 建立資料
      *
-     * @return {{ model_class }}
+     * @return TestResponse
      */
-    private function _make_model(): {{ model_class }}
+    private function _make_model(): TestResponse
     {
-        return $this::MODEL::create(_Consts::CREATE_DATA);
+        return $this->withoutMiddleware()->postJson($this::URL, _Consts::CREATE_DATA);
     }
 
     /**
