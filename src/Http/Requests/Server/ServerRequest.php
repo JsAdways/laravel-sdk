@@ -88,14 +88,14 @@ class ServerRequest extends FormRequest
     }
 
     /**
-     * Converts the object to an array, filtering out elements where the value starts with "/api/".
+     * Get the validated data from the request.
      *
-     * @return array
+     * @param  array|int|string|null  $key
+     * @param  mixed  $default
+     * @return mixed
      */
-    public function toArray(): array
+    public function validated($key = null, $default = null): array
     {
-        return Arr::where($this->all(),function($value,$key){
-            return !str_starts_with($key,"/api/");
-        });
+        return data_get($this->json()->all(), $key, $default);
     }
 }
