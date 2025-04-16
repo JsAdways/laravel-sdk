@@ -16,6 +16,15 @@ class {{ class_name }} extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->_pre_create();
+    }
+
+    protected function _pre_create(): void
+    {
+        foreach (_Consts::PARENT_DATA as $api => $payload)
+        {
+            $this->withoutMiddleware()->postJson("/api/{$api}", $payload);
+        }
     }
 
     private function _generate_payload(): array
