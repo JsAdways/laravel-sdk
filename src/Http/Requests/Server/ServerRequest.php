@@ -95,7 +95,7 @@ class ServerRequest extends FormRequest
     public function toArray(): array
     {
         return Arr::where($this->all(),function($value,$key){
-            return !str_starts_with("/api/", $value);
+            return !str_starts_with($key,"/api/");
         });
     }
 }
