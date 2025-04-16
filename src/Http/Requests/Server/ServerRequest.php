@@ -2,6 +2,7 @@
 
 namespace Jsadways\LaravelSDK\Http\Requests\Server;
 
+use Illuminate\Support\Arr;
 use Jsadways\LaravelSDK\Exceptions\BaseException;
 use Jsadways\LaravelSDK\Http\Requests\Server\Picker\BasePicker;
 use Jsadways\LaravelSDK\Managers\PickerManager;
@@ -84,5 +85,17 @@ class ServerRequest extends FormRequest
     protected function _get_delete_relations(): array
     {
         return $this->picker_object->get_delete_relations();
+    }
+
+    /**
+     * Converts the object to an array, filtering out elements where the value starts with "/api/".
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return Arr::where($this->all(),function($value,$key){
+            return !str_starts_with("/api/", $value);
+        });
     }
 }
