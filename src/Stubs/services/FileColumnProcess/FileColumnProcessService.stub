@@ -113,7 +113,7 @@ class FileColumnProcessService extends Service implements FileColumnProcessContr
 
             if(isset($payload['delete_'.$next['name']])) {
                 foreach($payload['delete_'.$next['name']] as $next_data){
-                    $next_db_data = collect($db_data[$next['name']])->where('id',$next_data)->first();
+                    $next_db_data = collect($db_data[$next['name']])->where('id',$next_data['id'])->first();
                     $this->_process_delete(structure:$next,db_data: $next_db_data);
                 }
             }
