@@ -8,6 +8,7 @@ use Jsadways\LaravelSDK\Http\Requests\Server\ServerRequest;
 
 trait Validator
 {
+    private array $validate_methods = ['create','update','delete'];
     /**
      * 初始化 validation schemas
      *
@@ -17,12 +18,14 @@ trait Validator
     #[PreCallAction]
     protected function init_validation_schemas(RequestCtx $ctx): void
     {
-        $parameters = $ctx->get_parameters();
-        if (array_is_list($parameters) and !empty($parameters) and (($request = $parameters[0]) instanceof ServerRequest))
-        {
-            $name = str_replace('Controller', '', class_basename(static::class));
-            $request->create_validation(model_name:$name,method_name:$ctx->get_method());
-            $ctx->set_parameters($request);
+        if(in_array($ctx->get_method(),$this->validate_methods)){
+            $parameters = $ctx->get_parameters();
+            if (array_is_list($parameters) and !empty($parameters) and (($request = $parameters[0]) instanceof ServerRequest))
+            {
+                $name = str_replace('Controller', '', class_basename(static::class));
+                $request->create_validation(model_name:$name,method_name:$ctx->get_method());
+                $ctx->set_parameters($request);
+            }
         }
     }
 
