@@ -5,6 +5,7 @@ namespace Jsadways\LaravelSDK\Http\Requests\Server;
 use Illuminate\Support\Arr;
 use Jsadways\LaravelSDK\Exceptions\BaseException;
 use Jsadways\LaravelSDK\Http\Requests\Server\Picker\BasePicker;
+use Jsadways\LaravelSDK\Http\Requests\Server\ValidateEnums\ValidateEnums;
 use Jsadways\LaravelSDK\Managers\PickerManager;
 use Jsadways\LaravelSDK\Http\Validation\ModelSchema;
 use Jsadways\LaravelSDK\Http\Validation\Unit\Picker;
@@ -56,6 +57,29 @@ class ServerRequest extends FormRequest
         return $this->validation_schemas;
     }
 
+    /**
+     * Get the validated data from the request.
+     *
+     * @param  array|int|string|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function validated($key = null, $default = null): array
+    {
+        return data_get($this->json()->all(), $key, $default);
+    }
+
+    public function validate(array $rules, ...$params): array
+    {
+        $validate_result = parent::validate($rules, $params);
+        $rules = $this->rules();
+
+        return (new ValidateEnums())->replace(
+            payload: $validate_result,
+            rules: $rules
+        );
+    }
+
     # 驗證picker relation相關
     #[Pure]
     protected function _get_picker(string $option): Picker
@@ -85,17 +109,5 @@ class ServerRequest extends FormRequest
     protected function _get_delete_relations(): array
     {
         return $this->picker_object->get_delete_relations();
-    }
-
-    /**
-     * Get the validated data from the request.
-     *
-     * @param  array|int|string|null  $key
-     * @param  mixed  $default
-     * @return mixed
-     */
-    public function validated($key = null, $default = null): array
-    {
-        return data_get($this->json()->all(), $key, $default);
     }
 }
