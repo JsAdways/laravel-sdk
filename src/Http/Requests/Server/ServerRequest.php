@@ -17,6 +17,7 @@ use ReflectionException;
 class ServerRequest extends FormRequest
 {
     protected array $validation_schemas = [];
+    protected array $validated_data = [];
     protected BasePicker $picker_object;
 
     /**
@@ -66,18 +67,18 @@ class ServerRequest extends FormRequest
      */
     public function validated($key = null, $default = null): array
     {
-        return data_get($this->json()->all(), $key, $default);
+        return data_get($this->validated_data, $key, $default);
     }
 
     public function validate(array $rules, ...$params): array
     {
         $validate_result = parent::validate($rules, $params);
-        $rules = $this->rules();
 
-        return (new ValidateEnums())->replace(
+        $this->validated_data = (new ValidateEnums())->replace(
             payload: $validate_result,
             rules: $rules
         );
+        return $validate_result;
     }
 
     # 驗證picker relation相關
