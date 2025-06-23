@@ -67,7 +67,8 @@ class ServerRequest extends FormRequest
      */
     public function validated($key = null, $default = null): array
     {
-        return data_get($this->validated_data, $key, $default);
+        $target_data = (count($this->validated_data) !== 0) ? $this->validated_data : $this->json()->all();
+        return data_get($target_data, $key, $default);
     }
 
     public function validate(array $rules, ...$params): array
@@ -79,6 +80,11 @@ class ServerRequest extends FormRequest
             rules: $rules
         );
         return $validate_result;
+    }
+
+    public function set_validated(array $data):void
+    {
+        $this->validated_data = $data;
     }
 
     # 驗證picker relation相關

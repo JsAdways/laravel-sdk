@@ -99,7 +99,7 @@ trait GeneralApi
      */
     public function create(Request $request): Model
     {
-        return $this->repo->create(new $this->__dto__(...$request->json()));
+        return $this->repo->create(new $this->__dto__(...$request->validated()));
     }
 
     /**
@@ -123,7 +123,7 @@ trait GeneralApi
      */
     public function update(Request $request): Model
     {
-        return $this->repo->update(new $this->__dto__(...$request->json()));
+        return $this->repo->update(new $this->__dto__(...$request->validated()));
     }
 
     /**
