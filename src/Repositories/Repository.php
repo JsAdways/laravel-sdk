@@ -336,6 +336,7 @@ class Repository
             if ($data = Arr::pull($payload, "update_{$relation_}", False))
             {
                 $table = $instance->{$relation_}()->getRelated();
+                $data = json_decode(json_encode($data),true);
                 batch()->update($table, $data, 'id');
             }
             if ($data = Arr::pull($payload, "delete_{$relation_}", False))
