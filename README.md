@@ -95,6 +95,30 @@ GOOGLE_CLOUD_STORAGE_API_URI=
 7. tests/Feature/TABLE_NAME/{Create/Delete/Read/Update}TABEL_NAMETest.php  
    產稱CRUD基礎測試內容，並放入假資料，請再依照實際內容修改
 
+## 將錯誤訊息同步至Slack
+config/logging.php
+增加一個channel
+```
+'channels' => [
+  --- other channels ---
+  'http_error_sender' => [
+      'driver' => 'monolog',
+      'handler' => Jsadways\LaravelSDK\Logging\HttpSlackLogHandler::class
+  ],
+]
+```
+將新的channel加入stack
+```
+'channels' => [
+  'stack' => [
+      'driver' => 'stack',
+      'channels' => ['single','http_error_sender'],
+      'ignore_exceptions' => false,
+  ],
+  --- other channels ---
+ ]
+```
+
 ## 提供資料生成指令
 Create Controller
 ```
