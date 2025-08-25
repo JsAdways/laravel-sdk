@@ -19,6 +19,7 @@ use Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass\MakeClassRepositoryDto;
 use Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass\MakeRoute;
 use Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass\MakeTest;
 use Jsadways\LaravelSDK\Console\Commands\RemoveSDK;
+use Jsadways\LaravelSDK\Console\Commands\SetupArchitectureCommand;
 
 class CommandServiceProvider extends ServiceProvider
 {
@@ -38,6 +39,7 @@ class CommandServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 GenerateArchitectureCommand::class,
+                SetupArchitectureCommand::class,
                 RemoveSDK::class,
                 GenerateApiDocs::class
             ]);
