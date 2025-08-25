@@ -4,6 +4,7 @@ namespace Jsadways\LaravelSDK\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Jsadways\LaravelSDK\Console\Commands\GenerateApiDocs;
+use Jsadways\LaravelSDK\Console\Commands\GenerateArchitectureCommand;
 use Jsadways\LaravelSDK\Console\Commands\OLD\CodeInit;
 use Jsadways\LaravelSDK\Console\Commands\OLD\InstallSDK;
 use Jsadways\LaravelSDK\Console\Commands\OLD\MakeBase\InstallBaseClasses;
@@ -36,20 +37,8 @@ class CommandServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                InstallBaseClasses::class,
-                InstallExampleClasses::class,
-                InstallRoute::class,
-                MakeClassController::class,
-                MakeClassControllerContract::class,
-                MakeClassRepository::class,
-                MakeClassRepositoryDto::class,
-                MakeClassModel::class,
-                MakeClassEnum::class,
-                MakeRoute::class,
-                MakeTest::class,
-                InstallSDK::class,
+                GenerateArchitectureCommand::class,
                 RemoveSDK::class,
-                CodeInit::class,
                 GenerateApiDocs::class
             ]);
         }
