@@ -1,7 +1,7 @@
 {
     "name": "jsadways/laravel-sdk",
     "type": "library",
-    "version": "1.0.34",
+    "version": "1.0.35",
     "autoload": {
         "psr-4": {
             "Jsadways\\LaravelSDK\\": "src/",
