@@ -37,8 +37,8 @@ class CommandServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/CLAUDE.md' => base_path('CLAUDE.md'),
-            __DIR__ . '/ARCHITECTURE_SETUP.md' => base_path('ARCHITECTURE_SETUP.md'),
+            __DIR__ . '/../CLAUDE.md' => base_path('CLAUDE.md'),
+            __DIR__ . '/../ARCHITECTURE_SETUP.md' => base_path('ARCHITECTURE_SETUP.md'),
         ], 'CLAUDE-docs');
 
         if ($this->app->runningInConsole()) {
