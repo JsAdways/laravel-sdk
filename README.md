@@ -23,13 +23,21 @@ composer require jsadways/laravel-sdk
 ```
 2. 安裝套件內容
 ```
-php artisan laravel-sdk:install
+php artisan setup:architecture
 ```
 3. 產生快速開發原始碼  
 ```
-php artisan laravel-sdk:code-init API
+php artisan generate:architecture
 ```
-註: API指的是會將route路徑產生在route/api.php中，並且將所有controller都生成在API資料夾內，如未指定則會產出在route/web.php中
+```
+generate:architecture
+{--model= : 生成特定模型的架構檔案}
+{--force : 覆蓋現有檔案}
+{--only= : 僅生成特定類型檔案 (models,contracts,dtos,repositories,controllers,routes,exceptions,services)}
+{--dry-run : 僅分析不生成檔案}
+```
+
+
 4. 在專案 .env 添加帳號驗證網址與前端網址  
 ```
 JS_AUTH_HOST='http://authenticate.tw'
@@ -119,46 +127,6 @@ config/logging.php
  ]
 ```
 
-## 提供資料生成指令
-Create Controller
-```
-php artisan make:sdk-controller API/MemberController
-
-#生成 app/Http/Controllers/API/MemberController.php
- 以及 app/Core/Controllers/Member/MemberContract.php
-```
-Create Model
-```
-php artisan make:sdk-model Member
-
-#生成 app/Models/Member.php
- 並依據Member table column產生 _schema() method內容
-```
-Create Repository
-```
-php artisan make:sdk-repository MemberRepository
-
-#生成 app/Repositories/MemberRepository.php
- 以及 app/Core/Repositories/Member/Dtos/CreateMemberDto.php 新增資料時的傳入物件內容
- 以及 app/COre/Repositories/Member/Dtos/UpdateMemberDto.php 更新資料時的傳入物件內容
- 可再依照使用情境修改
-```
-Create Enum
-```
-php artisan make:sdk-enum Member/Status --cases=On,Off
-
-#生成 app/Core/Enums/Member/Status.php
- 需要再手動修改檔案中每個case的Description與style_class屬性
-```
-Create Test  
-```
-php artisan app:gen-test
-{--action= : 想要測試的行為，目前提供 [All(預設全部), Create, Update, Delete, Read]。}
-{--model_class= : 想要測試的 Model 名稱。}
-{--group_name= : 測試組別名稱。}
-{--api= : 測試的 API 名稱。}
-
-#生成 tests/Feature/ 測試檔案
 ```
 Create API Documents
 ```
