@@ -11,6 +11,8 @@ class SetupArchitectureCommand extends Command
 
     public function handle()
     {
+        $result = $this->call('vendor:publish', ['--tag' => 'CLAUDE-docs']);
+
         $scriptPath = base_path('vendor/jsadways/laravel-sdk/src/setup-architecture.sh');
 
         if (!file_exists($scriptPath)) {
