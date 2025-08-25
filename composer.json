@@ -1,7 +1,7 @@
 {
     "name": "jsadways/laravel-sdk",
     "type": "library",
-    "version": "1.0.29",
+    "version": "1.0.30",
     "autoload": {
         "psr-4": {
             "Jsadways\\LaravelSDK\\": "src/",
@@ -35,5 +35,10 @@
         "spatie/laravel-google-cloud-storage": "^2.3",
         "intervention/image": "^3.10",
         "symfony/filesystem": "^7.2"
+    },
+    "scripts": {
+        "setup-architecture": [
+            "bash vendor/jsadways/laravel-sdk/src/setup-architecture.sh"
+        ]
     }
 }
