@@ -1,6 +1,6 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\Traits;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\Traits;
 
 trait route_method
 {

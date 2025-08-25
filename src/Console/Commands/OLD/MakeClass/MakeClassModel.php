@@ -1,8 +1,8 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeClass;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass;
 
-use Jsadways\LaravelSDK\Console\Commands\Traits\table_method;
+use Jsadways\LaravelSDK\Console\Commands\OLD\Traits\table_method;
 
 class MakeClassModel extends BaseMakeClassCommand
 {

@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Services\Internal;
+
+use App\Services\Service;
+
+class InternalService extends Service
+{
+    public function __construct()
+    {
+        // TODO: Initialize internal service dependencies
+    }
+
+    /**
+     * 處理內部業務邏輯
+     */
+    public function process($data): mixed
+    {
+        // TODO: Implement internal business logic
+        return null;
+    }
+}

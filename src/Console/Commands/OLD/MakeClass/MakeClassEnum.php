@@ -1,6 +1,6 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeClass;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Symfony\Component\Console\Input\InputArgument;

@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Core\Repositories\{{ModelName}}\Dtos;
+
+use Jsadways\LaravelSDK\Core\Dto;
+
+class Create{{ModelName}}Dto extends Dto
+{
+    public function __construct(
+{{properties}}
+    )
+    {
+    }
+}

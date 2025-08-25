@@ -1,10 +1,10 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeClass;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
-use Jsadways\LaravelSDK\Console\Commands\Traits\stub_files;
+use Jsadways\LaravelSDK\Console\Commands\OLD\Traits\stub_files;
 
 class BaseMakeClassCommand extends GeneratorCommand
 {

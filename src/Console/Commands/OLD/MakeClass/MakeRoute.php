@@ -1,12 +1,12 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeClass;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Jsadways\LaravelSDK\Console\Commands\Traits\stub_files;
-use Jsadways\LaravelSDK\Console\Commands\Traits\route_method;
+use Jsadways\LaravelSDK\Console\Commands\OLD\Traits\route_method;
+use Jsadways\LaravelSDK\Console\Commands\OLD\Traits\stub_files;
 
 class MakeRoute extends Command
 {

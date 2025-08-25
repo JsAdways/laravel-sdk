@@ -1,9 +1,9 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeClass;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass;
 
 use Illuminate\Support\Str;
-use Jsadways\LaravelSDK\Console\Commands\Traits\table_method;
+use Jsadways\LaravelSDK\Console\Commands\OLD\Traits\table_method;
 
 class MakeClassRepositoryDto extends BaseMakeClassCommand
 {

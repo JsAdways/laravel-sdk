@@ -1,0 +1,8 @@
+<?php
+
+{{useStatements}}
+use Illuminate\Support\Facades\Route;
+
+Route::middleware(['js-authenticate-middleware-alias'])->group(function () {
+{{routes}}
+});

@@ -1,6 +1,6 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\Traits;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\Traits;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;

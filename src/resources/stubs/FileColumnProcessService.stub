@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Services\FileColumnProcess;
+
+use App\Services\Service;
+use App\Core\Services\FileColumnProcess\Contracts\FileColumnProcessContract;
+
+class FileColumnProcessService extends Service implements FileColumnProcessContract
+{
+    public function process($data): mixed
+    {
+        // TODO: Implement file column processing logic
+        return null;
+    }
+}

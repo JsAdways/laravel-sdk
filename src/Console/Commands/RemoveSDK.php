@@ -2,7 +2,6 @@
 
 namespace Jsadways\LaravelSDK\Console\Commands;
 
-use Jsadways\LaravelSDK\Console\Commands\MakeBase\BaseMakeCommand;
 use Symfony\Component\Filesystem\Filesystem;
 use Throwable;
 

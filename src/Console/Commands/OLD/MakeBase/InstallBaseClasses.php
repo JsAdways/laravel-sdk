@@ -1,6 +1,8 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeBase;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\MakeBase;
+
+use Jsadways\LaravelSDK\Console\Commands\BaseMakeCommand;
 
 class InstallBaseClasses extends BaseMakeCommand
 {

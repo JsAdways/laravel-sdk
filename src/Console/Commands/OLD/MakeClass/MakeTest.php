@@ -1,17 +1,17 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeClass;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass;
 
+use Faker\Factory as Faker;
+use Faker\Generator;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use JetBrains\PhpStorm\Pure;
-use Jsadways\LaravelSDK\Console\Commands\Traits\stub_files;
+use Jsadways\LaravelSDK\Console\Commands\OLD\Traits\stub_files;
 use Jsadways\LaravelSDK\Core\Manager\GetObjectDto;
 use Jsadways\LaravelSDK\Managers\ModelManager;
 use Jsadways\LaravelSDK\Models\BaseModel;
-use Illuminate\Console\Command;
-use Faker\Factory as Faker;
-use Faker\Generator;
 
 class MakeTest extends Command
 {

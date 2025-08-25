@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Services\FileHandle;
+
+use App\Services\Service;
+use App\Core\Services\FileHandle\Contracts\ImageProcessContract;
+
+class ImageProcessService extends Service implements ImageProcessContract
+{
+    public function process($image): mixed
+    {
+        // TODO: Implement image processing logic
+        return null;
+    }
+
+    public function resize($image, $width, $height): mixed
+    {
+        // TODO: Implement image resizing logic
+        return null;
+    }
+
+    public function compress($image, $quality = 85): mixed
+    {
+        // TODO: Implement image compression logic
+        return null;
+    }
+}

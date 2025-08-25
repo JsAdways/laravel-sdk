@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Core\Controllers\{{ModelName}}\{{ModelName}}Contract;
+
+class {{ModelName}}Controller extends Controller implements {{ModelName}}Contract
+{
+    
+}

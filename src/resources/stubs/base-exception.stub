@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Exceptions;
+
+use Jsadways\LaravelSDK\Exceptions\BaseException as SDKBaseException;
+
+class BaseException extends SDKBaseException
+{
+    
+}

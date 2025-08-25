@@ -1,10 +1,10 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeBase;
+namespace Jsadways\LaravelSDK\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Jsadways\LaravelSDK\Console\Commands\Traits\stub_files;
+use Jsadways\LaravelSDK\Console\Commands\OLD\Traits\stub_files;
 
 class BaseMakeCommand extends Command
 {

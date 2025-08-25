@@ -1,6 +1,6 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeClass;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\MakeClass;
 
 class MakeClassControllerContract extends BaseMakeClassCommand
 {

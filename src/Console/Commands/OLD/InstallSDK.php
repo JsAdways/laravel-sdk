@@ -1,6 +1,6 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD;
 
 use Illuminate\Console\Command;
 use Throwable;

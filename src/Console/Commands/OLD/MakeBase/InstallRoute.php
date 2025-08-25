@@ -1,11 +1,11 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands\MakeBase;
+namespace Jsadways\LaravelSDK\Console\Commands\OLD\MakeBase;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Jsadways\LaravelSDK\Console\Commands\Traits\stub_files;
-use Jsadways\LaravelSDK\Console\Commands\Traits\route_method;
+use Jsadways\LaravelSDK\Console\Commands\OLD\Traits\route_method;
+use Jsadways\LaravelSDK\Console\Commands\OLD\Traits\stub_files;
 
 class InstallRoute extends Command
 {

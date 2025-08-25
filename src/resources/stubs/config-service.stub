@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Services\Config;
+
+use Jsadways\LaravelSDK\Exceptions\ServiceException;
+use App\Services\Service;
+use App\Core\Services\Config\Contracts\ConfigContract;
+use App\Core\Services\Config\Dtos\ConfigDto;
+
+class ConfigService extends Service implements ConfigContract
+{
+    // 開放讀取的設定
+    const CONFIG_OBTAINABLE = [
+        'example',
+    ];
+
+    public function __construct() {}
+
+    /**
+     * 取得設定列表
+     *
+     * @param array $fields
+     * @return ConfigDto
+     * @throws ServiceException
+     */
+    public function get(array $fields): ConfigDto|ServiceException
+    {
+        $config_list = [];
+        foreach ($fields as $value) {
+            if (!in_array($value, self::CONFIG_OBTAINABLE)) {
+                throw new ServiceException("${value} 不提供查詢。");
+            }
+            $config_value = config($value);
+            if (is_null($config_value)) {
+                throw new ServiceException("${value} 並無相關資料。");
+            }
+            $config_list[$value] = $config_value;
+        }
+
+        return new ConfigDto(
+            configs: $config_list
+        );
+    }
+}
