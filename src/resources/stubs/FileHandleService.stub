@@ -2,38 +2,143 @@
 
 namespace App\Services\FileHandle;
 
-use App\Services\Service;
+use Jsadways\LaravelSDK\Exceptions\ServiceException;
 use App\Core\Services\FileHandle\Contracts\FileHandleContract;
+use App\Core\Services\FileHandle\Dtos\FileClassifyDto;
+use App\Core\Services\FileHandle\Dtos\MatchResultDto;
+use App\Services\Service;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Throwable;
 
 class FileHandleService extends Service implements FileHandleContract
 {
-    public function classify($files): mixed
+    private int $file_cache_ttl = 60;
+    public function __construct(protected ImageProcessService $imageProcessService){}
+
+    public function classify(array $files_in_db,array $files): FileClassifyDto
     {
-        // TODO: Implement file classification logic
-        return null;
+        // TODO: Implement classify() method.
+        $files = collect($files);
+        $files_in_db = collect($files_in_db);
+        $files_to_create = $files->filter(function ($file){
+            return !is_array($file);
+        });
+        $files_not_modify = $files->filter(function ($file){
+            return is_array($file);
+        });
+        $file_to_delete = $files_in_db->pluck('path')->diff($files_not_modify->pluck('path'));
+
+        return new FileClassifyDto(files_to_create:$files_to_create->toArray(),files_not_modify:$files_not_modify->toArray(),files_to_delete:$file_to_delete->toArray());
     }
 
-    public function cache($files): mixed
+    /**
+     * @throws ServiceException
+     */
+    public function cache(UploadedFile $file): string
     {
-        // TODO: Implement file caching logic
-        return null;
+        // TODO: Implement cache() method.
+        try {
+            $key = Str::uuid()->toString();
+            $org_name = $file->getClientOriginalName();
+            if(Cache::has('file_name_cache_'.$org_name)){
+                $key = Cache::get('file_name_cache_'.$org_name);
+            }else{
+                Cache::set('file_name_cache_'.$org_name, $key, $this->file_cache_ttl);
+                Cache::set($key, ['name'=>$org_name,'content'=>$file->get()], $this->file_cache_ttl);
+            }
+
+            return $key;
+        }catch (Throwable $throwable){
+            throw new ServiceException($throwable->getMessage());
+        }
     }
 
-    public function store($files): mixed
+    /**
+     * @param array|string $file_key
+     * @return array
+     * @throws ServiceException
+     */
+    public function store(array|string $file_key): array
     {
-        // TODO: Implement file storage logic
-        return null;
+        // TODO: Implement store() method.
+        try {
+            $result = [];
+            $upload_files = $this->_make_files(key:$file_key);
+            foreach($upload_files as $upload_file){
+
+                $org_name = $upload_file->getClientOriginalName();
+                $upload_file = $this->imageProcessService->make($upload_file);
+
+                //存檔
+                $stored_path = $upload_file->store(env('UPLOAD_DIR'));
+                $size = Storage::size($stored_path);
+                $info = pathinfo($stored_path);
+
+                $result[] = [
+                    'dir' => $info['dirname'],
+                    'name' => $info['basename'],
+                    'org_name' => $org_name,
+                    'content_type' => $info['extension'],
+                    'file_size' => $size,
+                    'path' => $info['dirname'] . '/' . $info['basename'],
+                    'url' => Storage::url($info['dirname'] . '/' . $info['basename'])
+                ];
+            }
+
+            return $result;
+        }
+        catch (Throwable $throwable){
+            throw new ServiceException($throwable->getMessage());
+        }
     }
 
-    public function match($files): mixed
+    public function delete(array $files): void
     {
-        // TODO: Implement file matching logic
-        return null;
+        // TODO: Implement delete() method.
+        foreach ($files as $file) {
+            Storage::delete($file);
+        }
     }
 
-    public function delete($files): mixed
+    public function match(array $files_in_db,array $files_not_modify):MatchResultDto
     {
-        // TODO: Implement file deletion logic
-        return null;
+        // TODO: Implement match() method.
+        $files_in_db = collect($files_in_db);
+        $files_not_modify = collect($files_not_modify);
+
+        $error_msg = '上傳檔案資料比對錯誤，資料異動不再原範圍內';
+        $is_match = $this->_is_files_include(files_in_db:$files_in_db, files_target:$files_not_modify);
+
+        return new MatchResultDto(is_match: $is_match, message: $is_match ? '比對成功' : $error_msg);
+    }
+
+    protected function _make_files(array|string $key):array
+    {
+        $result = [];
+        if(!is_array($key)){
+            $key = [$key];
+        }
+
+        foreach ($key as $item){
+            if(Cache::has($item)){
+                $file_cache_item = Cache::get($item);
+                $temp_file_path = tempnam(sys_get_temp_dir(), '');
+                $temp = fopen($temp_file_path, 'w');
+
+                fwrite($temp, $file_cache_item['content']);
+                $result[] = new UploadedFile($temp_file_path,$file_cache_item['name']);
+            }
+        }
+
+        return $result;
+    }
+
+    protected function _is_files_include(Collection $files_in_db, Collection $files_target):bool
+    {
+        return json_encode($files_in_db->pluck('path')->intersect($files_target->pluck('path'))->values()) === json_encode($files_target->pluck('path'));
     }
 }

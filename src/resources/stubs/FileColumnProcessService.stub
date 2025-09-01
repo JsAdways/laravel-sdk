@@ -2,14 +2,192 @@
 
 namespace App\Services\FileColumnProcess;
 
-use App\Services\Service;
+use Jsadways\LaravelSDK\Exceptions\ServiceException;
 use App\Core\Services\FileColumnProcess\Contracts\FileColumnProcessContract;
+use App\Services\FileHandle\FileHandleService;
+use App\Services\Service;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use JetBrains\PhpStorm\ArrayShape;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
 
 class FileColumnProcessService extends Service implements FileColumnProcessContract
 {
-    public function process($data): mixed
+    private array $find_model_names = [];
+    public function __construct(private FileHandleService $file_handle_service){
+
+    }
+
+    /**
+     * @throws ServiceException
+     * @throws ReflectionException
+     */
+    public function create(array $payload, String $model): array
     {
-        // TODO: Implement file column processing logic
-        return null;
+        // TODO: Implement create() method.
+        $all_file_columns = $this->_get_file_columns($model);
+        return $this->_process_create(structure: $all_file_columns,payload: $payload);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ServiceException
+     */
+    public function update(array $payload, String $model, array $db_data): array
+    {
+        // TODO: Implement update() method.
+        $all_file_columns = $this->_get_file_columns($model);
+        return $this->_process_update(structure: $all_file_columns,payload: $payload,db_data: $db_data);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function delete(String $model, array $db_data): void
+    {
+        // TODO: Implement delete() method.
+        $all_file_columns = $this->_get_file_columns($model);
+        $this->_process_delete(structure: $all_file_columns,db_data: $db_data);
+    }
+
+    /**
+     * @throws ServiceException
+     */
+    protected function _process_create(array $structure, array $payload):array
+    {
+        foreach($structure['file_columns'] as $file_column){
+            if(isset($payload[$file_column])){
+
+                $payload[$file_column] = $this->file_handle_service->store(file_key:$payload[$file_column]);
+            }
+        }
+
+        foreach($structure['next'] as $next){
+            if(isset($payload['create_'.$next['name']])){
+                foreach($payload['create_'.$next['name']] as $index => $next_payload){
+                    $payload['create_'.$next['name']][$index] = $this->_process_create(structure:$next,payload:$next_payload);
+                }
+            }
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @throws ServiceException
+     */
+    protected function _process_update(array $structure, array $payload, array $db_data, bool $encode_file = false):array
+    {
+        foreach($structure['file_columns'] as $file_column){
+            if(isset($payload[$file_column])){
+                $files_in_db = ($db_data[$file_column] !== null ) ? $db_data[$file_column] : [];
+                $files_classify = $this->file_handle_service->classify($files_in_db,$payload[$file_column])->get(); # file_to_create[] , file_not_modify[] , file_to_delete[]
+                $confirm = $this->file_handle_service->match(files_in_db: $files_in_db,files_not_modify: $files_classify['files_not_modify']);
+                if (!$confirm->is_match)
+                {
+                    throw new ServiceException($confirm->message);
+                }
+                //刪除GCS檔案
+                $this->file_handle_service->delete(files:$files_classify['files_to_delete']);
+                //合併存檔
+                $payload[$file_column] = array_merge($this->file_handle_service->store(file_key:$files_classify['files_to_create']),$files_classify['files_not_modify']);
+                if($encode_file){
+                    $payload[$file_column] = json_encode($payload[$file_column]);
+                }
+            }
+        }
+
+        foreach($structure['next'] as $next){
+            if(isset($payload['create_'.$next['name']])){
+                foreach($payload['create_'.$next['name']] as $index=>$next_data){
+                    $payload['create_'.$next['name']][$index] = $this->_process_create(structure:$next,payload:$next_data);
+                }
+            }
+            if(isset($payload['update_'.$next['name']])){
+                foreach($payload['update_'.$next['name']] as $index=>$next_data){
+                    $next_db_data = collect($db_data[$next['name']])->where('id',$next_data['id'])->first();
+                    $payload['update_'.$next['name']][$index] = $this->_process_update(structure:$next,payload:$next_data,db_data: $next_db_data,encode_file:true);
+                }
+            }
+
+            if(isset($payload['delete_'.$next['name']])) {
+                foreach($payload['delete_'.$next['name']] as $next_data){
+                    $next_db_data = collect($db_data[$next['name']])->where('id',$next_data['id'])->first();
+                    $this->_process_delete(structure:$next,db_data: $next_db_data);
+                }
+            }
+        }
+
+        return $payload;
+    }
+
+    protected function _process_delete(array $structure, array $db_data)
+    {
+        foreach($structure['file_columns'] as $file_column){
+            $files_in_db = ($db_data[$file_column] !== null ) ? $db_data[$file_column] : [];
+            //刪除GCS檔案
+            $this->file_handle_service->delete(files:$files_in_db);
+        }
+
+        foreach($structure['next'] as $next){
+            if(isset($db_data[$next['name']]) && count($next['file_columns']) !== 0){
+                $next_db_data = $db_data[$next['name']];
+                foreach($next_db_data as $next_data){
+                    $this->_process_delete(structure:$next,db_data:$next_data);
+                }
+            }
+        }
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    #[ArrayShape(['model' => "string", 'name' => "string", 'file_columns' => "array|mixed", 'next' => "array"])]
+    protected function _get_file_columns(string $model, string $relation_name = ''):array
+    {
+        $this->find_model_names[] = $model;
+        $model_class = new ($model);
+        $target_model = new ReflectionClass($model_class);
+
+        $file_columns = [];
+        if($target_model->hasProperty('file_columns')){
+            $file_columns = $target_model->getProperty('file_columns')->getValue($model_class);
+        }
+
+        $relations = $this->_model_get_relations($target_model);
+        $next_result = [];
+        foreach ($relations as $relation){
+            $relation_table = $model_class->{$relation}()->getRelated();
+            if(!in_array($relation_table::class,$this->find_model_names)){
+                $next_result[] = $this->_get_file_columns($relation_table::class,$relation);
+            }
+        }
+
+        return [
+            'model' => $model,
+            'name' => $relation_name,
+            'file_columns' => $file_columns,
+            'next' => $next_result
+        ];
+    }
+
+    protected function _model_get_relations(ReflectionClass $model_class): array
+    {
+        return array_keys(array_reduce(
+            $model_class->getMethods(ReflectionMethod::IS_PUBLIC),
+            function ($result, ReflectionMethod $method) {
+                // If this function has a return type
+                ($returnType = (string) $method->getReturnType()) &&
+
+                // And this function returns a relation
+                is_subclass_of($returnType, Relation::class) &&
+
+                // Add name of this method to the relations array
+                ($result = array_merge($result, [$method->getName() => $returnType]));
+
+                return $result;
+            }, []
+        ));
     }
 }
