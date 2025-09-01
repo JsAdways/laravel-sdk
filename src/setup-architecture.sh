@@ -43,8 +43,23 @@ interface StaticSerializerContract
 }
 EOF
 
-# 建立基底 Repository (如果不存在)
-if [ ! -f "app/Repositories/Repository.php" ]; then
+# 建立基底 Model（強制覆蓋）
+cat > app/Models/Model.php << 'EOF'
+<?php
+namespace App\Models;
+use Jsadways\LaravelSDK\Models\BaseModel;
+
+class Model extends BaseModel
+{
+    protected function _schema(): array
+    {
+        // TODO: Implement _schema() method.
+        return [];
+    }
+}
+EOF
+
+# 建立基底 Repository（強制覆蓋）
 cat > app/Repositories/Repository.php << 'EOF'
 <?php
 
@@ -54,13 +69,11 @@ use Jsadways\LaravelSDK\Repositories\Repository as BaseRepository;
 
 class Repository extends BaseRepository
 {
-    
+
 }
 EOF
-fi
 
-# 更新 Controller (如果需要)
-if [ ! -f "app/Http/Controllers/Controller.php" ]; then
+# 更新 Controller（強制覆蓋）
 cat > app/Http/Controllers/Controller.php << 'EOF'
 <?php
 
@@ -70,15 +83,14 @@ use Jsadways\LaravelSDK\Http\BaseController;
 
 class Controller extends BaseController
 {
-    
+
 }
 EOF
-fi
 
 # 建立空的 Enums 目錄標記檔案
 touch app/Core/Enums/.gitkeep
 
-# 建立空的 Services 目錄標記檔案  
+# 建立空的 Services 目錄標記檔案
 touch app/Core/Services/.gitkeep
 touch app/Services/.gitkeep
 
