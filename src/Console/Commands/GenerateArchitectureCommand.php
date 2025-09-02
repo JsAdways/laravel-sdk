@@ -12,7 +12,7 @@ class GenerateArchitectureCommand extends Command
     protected $signature = 'generate:architecture
                            {--model= : 生成特定模型的架構檔案}
                            {--force : 覆蓋現有檔案}
-                           {--only= : 僅生成特定類型檔案 (models,contracts,dtos,repositories,controllers,routes,exceptions,services)}
+                           {--only= : 僅生成特定類型檔案 (models,contracts,dtos,repositories,controllers,routes,exceptions,services,api-controllers)}
                            {--dry-run : 僅分析不生成檔案}';
 
     protected $description = '基於 migration 檔案自動生成完整的架構檔案 (Models, Contracts, DTOs, Repositories, Controllers, Routes, Exceptions, Services)';
@@ -84,6 +84,11 @@ class GenerateArchitectureCommand extends Command
 
         if (!$onlyTypes || in_array('services', $onlyTypes)) {
             $this->_generateServices($isDryRun);
+        }
+
+        // 生成 API Controllers
+        if (!$onlyTypes || in_array('api-controllers', $onlyTypes)) {
+            $this->_generateApiControllers($isDryRun);
         }
 
         $this->info('✨ 架構生成完成！');
@@ -853,11 +858,21 @@ class GenerateArchitectureCommand extends Command
             // Internal Service 相關
             'Internal/Contracts' => [
                 'EnumServiceContract' => 'enum-service-contract.stub'
+            ],
+
+            // Controller Contracts
+            'Controllers/Internal' => [
+                'EnumGetterContract' => 'enum-getter-contract.stub'
             ]
         ];
 
         foreach ($coreFiles as $subDir => $files) {
-            $dirPath = app_path("Core/Services/{$subDir}");
+            // 判斷是否為 Controllers 相關路徑
+            if (strpos($subDir, 'Controllers/') === 0) {
+                $dirPath = app_path("Core/{$subDir}");
+            } else {
+                $dirPath = app_path("Core/Services/{$subDir}");
+            }
 
             if (!File::isDirectory($dirPath)) {
                 if (!$isDryRun) {
@@ -883,6 +898,92 @@ class GenerateArchitectureCommand extends Command
                 $this->info("   ✅ {$fileName}");
             }
         }
+    }
+
+    protected function _generateApiControllers($isDryRun = false)
+    {
+        $this->info('🌐 生成 API Controllers...');
+
+        // 生成 ConfigController
+        $this->_generateConfigController($isDryRun);
+
+        // 生成 FileUploadController
+        $this->_generateFileUploadController($isDryRun);
+
+        // 生成 InternalController
+        $this->_generateInternalController($isDryRun);
+    }
+
+    protected function _generateConfigController($isDryRun = false)
+    {
+        $template = File::get($this->_getStubPath('config-controller.stub'));
+        $dirPath = app_path('Http/Controllers/API');
+        $filePath = "{$dirPath}/ConfigController.php";
+
+        if ($isDryRun) {
+            $this->line("   📝 [DRY-RUN] Config Controller: {$filePath}");
+            return;
+        }
+
+        if (!File::isDirectory($dirPath)) {
+            File::makeDirectory($dirPath, 0755, true);
+        }
+
+        if (!$this->option('force') && File::exists($filePath)) {
+            $this->warn("   ⚠️  Config Controller 檔案已存在");
+            return;
+        }
+
+        File::put($filePath, $template);
+        $this->info("   ✅ Config Controller");
+    }
+
+    protected function _generateFileUploadController($isDryRun = false)
+    {
+        $template = File::get($this->_getStubPath('file-upload-controller.stub'));
+        $dirPath = app_path('Http/Controllers/API');
+        $filePath = "{$dirPath}/FileUploadController.php";
+
+        if ($isDryRun) {
+            $this->line("   📝 [DRY-RUN] FileUpload Controller: {$filePath}");
+            return;
+        }
+
+        if (!File::isDirectory($dirPath)) {
+            File::makeDirectory($dirPath, 0755, true);
+        }
+
+        if (!$this->option('force') && File::exists($filePath)) {
+            $this->warn("   ⚠️  FileUpload Controller 檔案已存在");
+            return;
+        }
+
+        File::put($filePath, $template);
+        $this->info("   ✅ FileUpload Controller");
+    }
+
+    protected function _generateInternalController($isDryRun = false)
+    {
+        $template = File::get($this->_getStubPath('internal-controller.stub'));
+        $dirPath = app_path('Http/Controllers/API');
+        $filePath = "{$dirPath}/InternalController.php";
+
+        if ($isDryRun) {
+            $this->line("   📝 [DRY-RUN] Internal Controller: {$filePath}");
+            return;
+        }
+
+        if (!File::isDirectory($dirPath)) {
+            File::makeDirectory($dirPath, 0755, true);
+        }
+
+        if (!$this->option('force') && File::exists($filePath)) {
+            $this->warn("   ⚠️  Internal Controller 檔案已存在");
+            return;
+        }
+
+        File::put($filePath, $template);
+        $this->info("   ✅ Internal Controller");
     }
 
     protected function _getStubPath($stubName): string

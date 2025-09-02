@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Core\Controllers\Internal\EnumGetterContract;
+use App\Http\Controllers\Controller;
+use App\Services\Internal\InternalService;
+use Illuminate\Http\Request;
+use Jsadways\LaravelSDK\Exceptions\ServiceException;
+
+class InternalController extends Controller implements EnumGetterContract
+{
+    public function __construct(
+        protected InternalService $server
+    ) {}
+
+    /**
+     * @throws ServiceException
+     */
+    public function get_enums(Request $request): array
+    {
+        ['filter' => $filter] = $request->validate([
+            'filter' => 'required|string',
+        ]);
+        return $this->server->get_enums(json_decode($filter, true)['fields']);
+    }
+}

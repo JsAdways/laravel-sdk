@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use Jsadways\LaravelSDK\Exceptions\ServiceException;
+use App\Http\Controllers\Controller;
+use App\Services\FileHandle\FileHandleService;
+use Illuminate\Http\Request;
+
+class FileUploadController extends Controller
+{
+    public function __construct(private FileHandleService $file_handle_service)
+    {
+    }
+
+    /**
+     * @throws ServiceException
+     */
+    public function cache(Request $request): string
+    {
+        return $this->file_handle_service->cache($request->file('file'));
+    }
+}
