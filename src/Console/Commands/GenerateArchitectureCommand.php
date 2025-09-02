@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Jsadways\LaravelSDK\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
