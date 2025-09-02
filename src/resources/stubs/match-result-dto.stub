@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Core\Services\FileHandle\Dtos;
+
+use Jsadways\LaravelSDK\Core\Dto;
+
+final class MatchResultDto extends Dto
+{
+    public function __construct(
+        public readonly bool $is_match,
+        public readonly string $message
+    )
+    {
+
+    }
+}

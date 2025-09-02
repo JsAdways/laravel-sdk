@@ -2,7 +2,24 @@
 
 ## 🚀 快速開始
 
-### 1. 複製到新專案
+### 方法一：使用自動化腳本（推薦）
+```bash
+# 1. 複製檔案到新專案
+cp CLAUDE.md /path/to/new-project/
+cp ARCHITECTURE_SETUP.md /path/to/new-project/
+cp setup-architecture.sh /path/to/new-project/
+cp -r app/Console/Commands/GenerateArchitectureCommand.php /path/to/new-project/app/Console/Commands/
+cp -r resources/stubs/ /path/to/new-project/resources/
+
+# 2. 執行自動化設置腳本
+cd /path/to/new-project/
+chmod +x setup-architecture.sh
+./setup-architecture.sh
+```
+
+### 方法二：手動設置
+
+#### 1. 複製到新專案
 ```bash
 # 複製必要檔案到新專案
 cp CLAUDE.md /path/to/new-project/
@@ -11,13 +28,13 @@ cp -r app/Console/Commands/GenerateArchitectureCommand.php /path/to/new-project/
 cp -r resources/stubs/ /path/to/new-project/resources/
 ```
 
-### 2. 建立基礎目錄結構
+#### 2. 建立基礎目錄結構
 ```bash
 mkdir -p app/Core/{Contracts,Controllers,Enums,Repositories,Services}
 mkdir -p app/{Repositories,Services}
 ```
 
-### 3. 建立基礎檔案
+#### 3. 建立基礎檔案
 
 **app/Core/Contracts/SerializerContract.php:**
 ```php
@@ -45,6 +62,22 @@ use Jsadways\LaravelSDK\Repositories\Repository as BaseRepository;
 class Repository extends BaseRepository {}
 ```
 
+**app/Models/Model.php:**
+```php
+<?php
+namespace App\Models;
+use Jsadways\LaravelSDK\Models\BaseModel;
+
+class Model extends BaseModel
+{
+    protected function _schema(): array
+    {
+        // TODO: Implement _schema() method.
+        return [];
+    }
+}
+```
+
 **app/Http/Controllers/Controller.php:**
 ```php
 <?php
@@ -53,7 +86,7 @@ use Jsadways\LaravelSDK\Http\BaseController;
 class Controller extends BaseController {}
 ```
 
-### 4. 執行生成
+#### 4. 執行生成
 ```bash
 # 建立 migration 檔案後
 php artisan generate:architecture
@@ -205,8 +238,8 @@ php artisan generate:architecture --only=models --verbose
 
 ### 新專案設置檢查
 - [ ] 複製 CLAUDE.md 和相關檔案
-- [ ] 建立必要目錄結構
-- [ ] 建立基礎 Contract 和 Repository 檔案
+- [ ] 執行 setup-architecture.sh 腳本（或手動建立目錄結構）
+- [ ] 建立基礎 Contract、Repository 和 Model 檔案
 - [ ] 註冊 GenerateArchitectureCommand
 - [ ] 建立 migration 檔案
 - [ ] 執行生成指令

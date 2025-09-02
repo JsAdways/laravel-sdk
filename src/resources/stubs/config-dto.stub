@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Core\Services\Config\Dtos;
+
+use Jsadways\LaravelSDK\Core\Dto;
+
+final class ConfigDto extends Dto
+{
+    public function __construct (
+        public readonly array $configs,
+    ){}
+}
