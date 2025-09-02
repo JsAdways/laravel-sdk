@@ -1,6 +1,6 @@
 <?php
 
-namespace Jsadways\LaravelSDK\Console\Commands;
+namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -17,15 +17,11 @@ class GenerateArchitectureCommand extends Command
 
     protected $description = '基於 migration 檔案自動生成完整的架構檔案 (Models, Contracts, DTOs, Repositories, Controllers, Routes, Exceptions, Services)';
 
-    protected array $migrationData = [];
-    protected array $relationships = [];
+    protected $migrationData = [];
+    protected $relationships = [];
 
     public function handle()
     {
-        $this->call('vendor:publish',[
-            '--provider' => 'Js\Authenticator\Providers\AuthServiceProvider'
-        ]);
-
         $this->info('🚀 Laravel 架構生成工具啟動...');
 
         // 解析 migration 檔案
@@ -95,7 +91,7 @@ class GenerateArchitectureCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function _parseMigrations(): void
+    protected function _parseMigrations()
     {
         $migrationPath = database_path('migrations');
         $files = File::glob($migrationPath . '/*.php');
@@ -122,7 +118,7 @@ class GenerateArchitectureCommand extends Command
         return null;
     }
 
-    protected function _parseTableStructure($content): array
+    protected function _parseTableStructure($content)
     {
         $fields = [];
         $foreignKeys = [];
@@ -132,36 +128,17 @@ class GenerateArchitectureCommand extends Command
         foreach ($lines as $line) {
             $line = trim($line);
 
-            // 調試輸出
-            if ($this->getOutput()->isVerbose() && strpos($line, '$table->') !== false) {
-                $this->line("    🔍 處理行: $line");
-            }
-
-            // 跳過 id, timestamps, softDeletes, foreign keys, 純註解行, index 等
+            // 跳過 id, timestamps, softDeletes
             if (strpos($line, '->id()') !== false ||
                 strpos($line, '->timestamps()') !== false ||
-                strpos($line, '->softDeletes()') !== false ||
-                strpos($line, '->foreign(') !== false ||
-                strpos($line, '->index(') !== false ||
-                strpos($line, '->unique(') !== false ||
-                preg_match('/\$table->comment\([\'"]/', $line)) { // 跳過表格註解
+                strpos($line, '->softDeletes()') !== false) {
                 continue;
             }
 
-            // 解析一般欄位 - 包含參數的欄位類型
+            // 解析一般欄位
             if (preg_match('/\$table->(\w+)\([\'"]([^\'\"]+)[\'"]/', $line, $matches)) {
                 $type = $matches[1];
                 $fieldName = $matches[2];
-
-                // 映射特殊類型
-                $typeMapping = [
-                    'unsignedInteger' => 'integer',
-                    'unsignedBigInteger' => 'integer',
-                ];
-
-                if (isset($typeMapping[$type])) {
-                    $type = $typeMapping[$type];
-                }
 
                 $field = [
                     'name' => $fieldName,
@@ -170,10 +147,8 @@ class GenerateArchitectureCommand extends Command
                     'default' => $this->_extractDefault($line),
                 ];
 
-                // 解析長度限制 - 改進的正則表達式
+                // 解析長度限制
                 if (preg_match('/\([\'"][^\'\"]+[\'"],\s*(\d+)\)/', $line, $lengthMatches)) {
-                    $field['length'] = (int)$lengthMatches[1];
-                } elseif (preg_match('/\([\'"][^\'\"]+[\'"],(\d+)\)/', $line, $lengthMatches)) {
                     $field['length'] = (int)$lengthMatches[1];
                 }
 
@@ -186,7 +161,6 @@ class GenerateArchitectureCommand extends Command
                         'references' => $this->_guessForeignTable($fieldName)
                     ];
                 }
-                continue; // 避免重複處理
             }
 
             // 解析 foreignId
@@ -202,7 +176,6 @@ class GenerateArchitectureCommand extends Command
                     'column' => $fieldName,
                     'references' => $this->_guessForeignTable($fieldName)
                 ];
-                continue; // 避免重複處理
             }
         }
 
@@ -212,7 +185,7 @@ class GenerateArchitectureCommand extends Command
         ];
     }
 
-    protected function _extractDefault($line): ?string
+    protected function _extractDefault($line)
     {
         if (preg_match('/->default\(([^)]+)\)/', $line, $matches)) {
             return trim($matches[1], "'\"");
@@ -220,158 +193,42 @@ class GenerateArchitectureCommand extends Command
         return null;
     }
 
-    protected function _guessForeignTable($fieldName): string
+    protected function _guessForeignTable($fieldName)
     {
-        // 移除 _id 後綴
+        // 移除 _id 後綴，轉為複數表名
         $baseName = Str::beforeLast($fieldName, '_id');
-
-        // 特殊映射表格名稱
-        $tableMapping = [
-            'creator' => 'member',
-            'front_photo' => 'album_photo',
-            'album' => 'album', // 保持單數
-            'member' => 'member', // 保持單數
-            'baby' => 'baby', // 保持單數
-        ];
-
-        if (isset($tableMapping[$baseName])) {
-            return $tableMapping[$baseName];
-        }
-
-        // 檢查是否存在單數形式的表格
-        if (isset($this->migrationData[$baseName])) {
-            return $baseName;
-        }
-
-        // 否則嘗試複數形式
-        $pluralName = Str::plural($baseName);
-        if (isset($this->migrationData[$pluralName])) {
-            return $pluralName;
-        }
-
-        // 默認返回單數形式
-        return $baseName;
+        return Str::plural($baseName);
     }
 
-    protected function _getBelongsToMethodName($foreignKey, $parentTable): string
-    {
-        // 移除 _id 後綴作為方法名稱
-        $baseName = Str::beforeLast($foreignKey, '_id');
-
-        // 特殊方法名稱映射
-        $methodMapping = [
-            'creator_id' => 'member',
-            'front_photo_id' => 'front_photo', // 這個可能需要特別處理
-        ];
-
-        if (isset($methodMapping[$foreignKey])) {
-            return $methodMapping[$foreignKey];
-        }
-
-        return $baseName;
-    }
-
-    protected function _getModelNameFromTable($tableName): string
-    {
-        // 特殊表格到模型的映射
-        $modelMapping = [
-            'member' => 'Member',
-            'album_photo' => 'AlbumPhoto',
-            'album' => 'Album',
-        ];
-
-        if (isset($modelMapping[$tableName])) {
-            return $modelMapping[$tableName];
-        }
-
-        return Str::studly(Str::singular($tableName));
-    }
-
-    protected function _getTableNameFromModel($modelName): string
-    {
-        // 特殊模型到表格的映射（與 _getModelNameFromTable 相反）
-        $tableMapping = [
-            'Album' => 'album',
-            'AlbumPhoto' => 'album_photo',
-            'Member' => 'member',
-            'Baby' => 'baby',
-            'BabyPage' => 'baby_page',
-        ];
-
-        if (isset($tableMapping[$modelName])) {
-            return $tableMapping[$modelName];
-        }
-
-        // 默認規則：將模型名稱轉為 snake_case 並保持單數
-        return Str::snake($modelName);
-    }
-
-    protected function _getHasManyMethodName($childTable): string
-    {
-        // 特殊 HasMany 方法名稱映射
-        $methodMapping = [
-            'album_photo' => 'album_photo_list',
-            'album_photo_attr' => 'album_photo_attr_list',
-            'baby_page' => 'baby_page_list',
-            'member_evaluate' => 'member_evaluate_list',
-            'forum_reply' => 'forum_reply_list',
-        ];
-
-        if (isset($methodMapping[$childTable])) {
-            return $methodMapping[$childTable];
-        }
-
-        // 默認規則：singular(table_name) + '_list'
-        return Str::singular($childTable) . '_list';
-    }
-
-    protected function _analyzeRelationships(): void
+    protected function _analyzeRelationships()
     {
         foreach ($this->migrationData as $tableName => $tableData) {
-            if ($this->getOutput()->isVerbose()) {
-                $this->line("  🔗 分析 {$tableName} 的外鍵: " . json_encode($tableData['foreign_keys']));
-            }
-
             foreach ($tableData['foreign_keys'] as $fk) {
                 $childTable = $tableName;
                 $parentTable = $fk['references'];
 
-                if ($this->getOutput()->isVerbose()) {
-                    $this->line("    🔗 外鍵: {$childTable}.{$fk['column']} -> {$parentTable}.id");
-                }
-
                 // HasMany 關聯 (父表 -> 子表)
                 if (isset($this->migrationData[$parentTable])) {
-                    $methodName = $this->_getHasManyMethodName($childTable);
                     $this->relationships[$parentTable]['hasMany'][] = [
                         'related' => $childTable,
                         'foreign_key' => $fk['column'],
-                        'method_name' => $methodName
+                        'method_name' => Str::singular($childTable) . '_list'
                     ];
-
-                    if ($this->getOutput()->isVerbose()) {
-                        $this->line("    ✅ HasMany: {$parentTable} -> {$methodName}()");
-                    }
                 }
 
                 // BelongsTo 關聯 (子表 -> 父表)
-                $methodName = $this->_getBelongsToMethodName($fk['column'], $parentTable);
                 $this->relationships[$childTable]['belongsTo'][] = [
                     'related' => $parentTable,
                     'foreign_key' => $fk['column'],
-                    'method_name' => $methodName
+                    'method_name' => Str::singular($parentTable)
                 ];
-
-                if ($this->getOutput()->isVerbose()) {
-                    $this->line("    ✅ BelongsTo: {$childTable} -> {$methodName}()");
-                }
             }
         }
     }
 
-    protected function _generateModel($modelName, $tableName, $tableData, $isDryRun = false): void
+    protected function _generateModel($modelName, $tableName, $tableData, $isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('model.stub'));
+        $template = File::get(resource_path('stubs/model.stub'));
 
         // 生成 _schema() 內容
         $schemaRules = $this->_generateSchemaRules($tableData['fields']);
@@ -407,18 +264,11 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Model: {$modelName}");
     }
 
-    protected function _generateSchemaRules($fields): string
+    protected function _generateSchemaRules($fields)
     {
         $rules = [];
-        $processedFields = []; // 避免重複欄位
 
         foreach ($fields as $field) {
-            // 跳過重複欄位
-            if (in_array($field['name'], $processedFields)) {
-                continue;
-            }
-            $processedFields[] = $field['name'];
-
             $rule = [];
 
             if (!$field['nullable']) {
@@ -466,24 +316,17 @@ class GenerateArchitectureCommand extends Command
         return implode(",\n", $rules);
     }
 
-    protected function _generateModelRelations($tableName): string
+    protected function _generateModelRelations($tableName)
     {
         $relations = [];
-        $processedMethods = []; // 避免重複方法
         $tableRelations = $this->relationships[$tableName] ?? [];
 
         // HasMany 關聯
         if (isset($tableRelations['hasMany'])) {
             foreach ($tableRelations['hasMany'] as $relation) {
-                $relatedModel = $this->_getModelNameFromTable($relation['related']);
+                $relatedModel = Str::studly(Str::singular($relation['related']));
                 $methodName = $relation['method_name'];
                 $foreignKey = $relation['foreign_key'];
-
-                // 避免重複方法
-                if (in_array($methodName, $processedMethods)) {
-                    continue;
-                }
-                $processedMethods[] = $methodName;
 
                 $relations[] = "
     public function {$methodName}(): HasMany
@@ -496,15 +339,9 @@ class GenerateArchitectureCommand extends Command
         // BelongsTo 關聯
         if (isset($tableRelations['belongsTo'])) {
             foreach ($tableRelations['belongsTo'] as $relation) {
-                $relatedModel = $this->_getModelNameFromTable($relation['related']);
+                $relatedModel = Str::studly(Str::singular($relation['related']));
                 $methodName = $relation['method_name'];
                 $foreignKey = $relation['foreign_key'];
-
-                // 避免重複方法
-                if (in_array($methodName, $processedMethods)) {
-                    continue;
-                }
-                $processedMethods[] = $methodName;
 
                 $relations[] = "
     public function {$methodName}(): BelongsTo
@@ -517,9 +354,9 @@ class GenerateArchitectureCommand extends Command
         return implode("\n", $relations);
     }
 
-    protected function _generateContract($modelName, $isDryRun = false): void
+    protected function _generateContract($modelName, $isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('contract.stub'));
+        $template = File::get(resource_path('stubs/contract.stub'));
 
         $content = str_replace('{{ModelName}}', $modelName, $template);
 
@@ -544,7 +381,7 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Contract: {$modelName}Contract");
     }
 
-    protected function _generateDtos($modelName, $tableData, $isDryRun = false): void
+    protected function _generateDtos($modelName, $tableData, $isDryRun = false)
     {
         // Generate Create DTO
         $this->_generateCreateDto($modelName, $tableData, $isDryRun);
@@ -553,9 +390,9 @@ class GenerateArchitectureCommand extends Command
         $this->_generateUpdateDto($modelName, $tableData, $isDryRun);
     }
 
-    protected function _generateCreateDto($modelName, $tableData, $isDryRun = false): void
+    protected function _generateCreateDto($modelName, $tableData, $isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('create-dto.stub'));
+        $template = File::get(resource_path('stubs/create-dto.stub'));
 
         $properties = $this->_generateDtoProperties($tableData['fields'], false);
         $relationArrays = $this->_generateCreateDtoRelationArrays($modelName);
@@ -594,9 +431,9 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Create DTO: Create{$modelName}Dto");
     }
 
-    protected function _generateUpdateDto($modelName, $tableData, $isDryRun = false): void
+    protected function _generateUpdateDto($modelName, $tableData, $isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('update-dto.stub'));
+        $template = File::get(resource_path('stubs/update-dto.stub'));
 
         $properties = $this->_generateDtoProperties($tableData['fields'], true);
         $relationArrays = $this->_generateUpdateDtoRelationArrays($modelName);
@@ -635,23 +472,15 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Update DTO: Update{$modelName}Dto");
     }
 
-    protected function _generateDtoProperties($fields, $includeId = false): string
+    protected function _generateDtoProperties($fields, $includeId = false)
     {
         $properties = [];
-        $processedFields = []; // 避免重複欄位
 
         if ($includeId) {
             $properties[] = "        public readonly int \$id";
-            $processedFields[] = 'id';
         }
 
         foreach ($fields as $field) {
-            // 跳過重複欄位
-            if (in_array($field['name'], $processedFields)) {
-                continue;
-            }
-            $processedFields[] = $field['name'];
-
             $type = $this->_mapFieldTypeToPhp($field);
             $nullable = $field['nullable'] ? '?' : '';
 
@@ -661,7 +490,7 @@ class GenerateArchitectureCommand extends Command
         return implode(",\n", $properties);
     }
 
-    protected function _mapFieldTypeToPhp($field): string
+    protected function _mapFieldTypeToPhp($field)
     {
         switch ($field['type']) {
             case 'string':
@@ -687,37 +516,25 @@ class GenerateArchitectureCommand extends Command
         }
     }
 
-    protected function _generateCreateDtoRelationArrays($modelName): string
+    protected function _generateCreateDtoRelationArrays($modelName)
     {
-        // 根據模型名稱找到對應的實際表格名稱
-        $tableName = $this->_getTableNameFromModel($modelName);
+        $tableName = Str::plural(Str::snake($modelName));
         $tableRelations = $this->relationships[$tableName] ?? [];
         $arrays = [];
-
-        // 調試輸出
-        if ($this->getOutput()->isVerbose()) {
-            $this->line("    🔍 檢查 {$modelName} ({$tableName}) 的關聯...");
-            $this->line("    🔍 關聯資料: " . json_encode($tableRelations));
-        }
 
         if (isset($tableRelations['hasMany'])) {
             foreach ($tableRelations['hasMany'] as $relation) {
                 $methodName = $relation['method_name'];
                 $arrays[] = "        public readonly array \$create_{$methodName} = []";
-
-                if ($this->getOutput()->isVerbose()) {
-                    $this->line("    ✅ 新增關聯陣列: create_{$methodName}");
-                }
             }
         }
 
         return implode(",\n", $arrays);
     }
 
-    protected function _generateUpdateDtoRelationArrays($modelName): string
+    protected function _generateUpdateDtoRelationArrays($modelName)
     {
-        // 根據模型名稱找到對應的實際表格名稱
-        $tableName = $this->_getTableNameFromModel($modelName);
+        $tableName = Str::plural(Str::snake($modelName));
         $tableRelations = $this->relationships[$tableName] ?? [];
         $arrays = [];
 
@@ -733,9 +550,9 @@ class GenerateArchitectureCommand extends Command
         return implode(",\n", $arrays);
     }
 
-    protected function _generateRepository($modelName, $isDryRun = false): void
+    protected function _generateRepository($modelName, $isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('repository.stub'));
+        $template = File::get(resource_path('stubs/repository.stub'));
 
         $content = str_replace('{{ModelName}}', $modelName, $template);
 
@@ -755,9 +572,9 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Repository: {$modelName}Repository");
     }
 
-    protected function _generateController($modelName, $isDryRun = false): void
+    protected function _generateController($modelName, $isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('controller.stub'));
+        $template = File::get(resource_path('stubs/controller.stub'));
 
         $content = str_replace('{{ModelName}}', $modelName, $template);
 
@@ -777,7 +594,7 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Controller: {$modelName}Controller");
     }
 
-    protected function _generateRoutes($isDryRun = false): void
+    protected function _generateRoutes($isDryRun = false)
     {
         $routes = [];
 
@@ -794,7 +611,7 @@ class GenerateArchitectureCommand extends Command
             $routes[] = "";
         }
 
-        $template = File::get($this->_getStubPath('routes.stub'));
+        $template = File::get(resource_path('stubs/routes.stub'));
         $useStatements = $this->_generateControllerUseStatements();
 
         $content = str_replace([
@@ -816,7 +633,7 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Routes: api.php");
     }
 
-    protected function _generateControllerUseStatements(): string
+    protected function _generateControllerUseStatements()
     {
         $uses = [];
 
@@ -839,9 +656,9 @@ class GenerateArchitectureCommand extends Command
         $this->_generateExceptionHandler($isDryRun);
     }
 
-    protected function _generateBaseException($isDryRun = false): void
+    protected function _generateBaseException($isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('base-exception.stub'));
+        $template = File::get(resource_path('stubs/base-exception.stub'));
         $filePath = app_path('Exceptions/BaseException.php');
 
         if ($isDryRun) {
@@ -862,9 +679,9 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ BaseException");
     }
 
-    protected function _generateExceptionHandler($isDryRun = false): void
+    protected function _generateExceptionHandler($isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('exception-handler.stub'));
+        $template = File::get(resource_path('stubs/exception-handler.stub'));
         $filePath = app_path('Exceptions/Handler.php');
 
         if ($isDryRun) {
@@ -881,9 +698,12 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Exception Handler");
     }
 
-    protected function _generateServices($isDryRun = false): void
+    protected function _generateServices($isDryRun = false)
     {
         $this->info("⚙️  生成必要的 Service 檔案...");
+
+        // 生成 Core 檔案（Contracts 和 DTOs）
+        $this->_generateServiceCoreFiles($isDryRun);
 
         // 生成基底 Service 檔案
         $this->_generateBaseService($isDryRun);
@@ -896,9 +716,9 @@ class GenerateArchitectureCommand extends Command
         $this->_generateInternalService($isDryRun);
     }
 
-    protected function _generateBaseService($isDryRun = false): void
+    protected function _generateBaseService($isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('base-service.stub'));
+        $template = File::get(resource_path('stubs/base-service.stub'));
         $filePath = app_path('Services/Service.php');
 
         if ($isDryRun) {
@@ -919,9 +739,9 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Base Service");
     }
 
-    protected function _generateConfigService($isDryRun = false): void
+    protected function _generateConfigService($isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('config-service.stub'));
+        $template = File::get(resource_path('stubs/config-service.stub'));
         $dirPath = app_path('Services/Config');
         $filePath = "{$dirPath}/ConfigService.php";
 
@@ -943,7 +763,7 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Config Service");
     }
 
-    protected function _generateFileHandleServices($isDryRun = false): void
+    protected function _generateFileHandleServices($isDryRun = false)
     {
         $services = [
             'FileHandle' => ['FileHandleService', 'ImageProcessService'],
@@ -958,7 +778,7 @@ class GenerateArchitectureCommand extends Command
             }
 
             foreach ($serviceFiles as $serviceFile) {
-                $template = File::get($this->_getStubPath("{$serviceFile}.stub"));
+                $template = File::get(resource_path("stubs/{$serviceFile}.stub"));
                 $filePath = "{$dirPath}/{$serviceFile}.php";
 
                 if ($isDryRun) {
@@ -977,9 +797,9 @@ class GenerateArchitectureCommand extends Command
         }
     }
 
-    protected function _generateInternalService($isDryRun = false): void
+    protected function _generateInternalService($isDryRun = false)
     {
-        $template = File::get($this->_getStubPath('internal-service.stub'));
+        $template = File::get(resource_path('stubs/internal-service.stub'));
         $dirPath = app_path('Services/Internal');
         $filePath = "{$dirPath}/InternalService.php";
 
@@ -1001,9 +821,67 @@ class GenerateArchitectureCommand extends Command
         $this->info("   ✅ Internal Service");
     }
 
-    protected function _getStubPath($stubName): string
+    protected function _generateServiceCoreFiles($isDryRun = false)
     {
-        // 從 Command 檔案位置向上兩層到套件根目錄，然後進入 resources/stubs
-        return __DIR__ . '/../../resources/stubs/' . $stubName;
+        $this->info("🏗️  生成 Service Core 檔案...");
+
+        // Core 檔案定義
+        $coreFiles = [
+            // Config Service 相關
+            'Config/Contracts' => [
+                'ConfigContract' => 'config-contract.stub'
+            ],
+            'Config/Dtos' => [
+                'ConfigDto' => 'config-dto.stub'
+            ],
+
+            // FileColumnProcess Service 相關
+            'FileColumnProcess/Contracts' => [
+                'FileColumnProcessContract' => 'file-column-process-contract.stub'
+            ],
+
+            // FileHandle Service 相關
+            'FileHandle/Contracts' => [
+                'FileHandleContract' => 'file-handle-contract.stub',
+                'ImageProcessContract' => 'image-process-contract.stub'
+            ],
+            'FileHandle/Dtos' => [
+                'FileClassifyDto' => 'file-classify-dto.stub',
+                'MatchResultDto' => 'match-result-dto.stub'
+            ],
+
+            // Internal Service 相關
+            'Internal/Contracts' => [
+                'EnumServiceContract' => 'enum-service-contract.stub'
+            ]
+        ];
+
+        foreach ($coreFiles as $subDir => $files) {
+            $dirPath = app_path("Core/Services/{$subDir}");
+
+            if (!File::isDirectory($dirPath)) {
+                if (!$isDryRun) {
+                    File::makeDirectory($dirPath, 0755, true);
+                }
+            }
+
+            foreach ($files as $fileName => $stubFile) {
+                $template = File::get(resource_path("stubs/{$stubFile}"));
+                $filePath = "{$dirPath}/{$fileName}.php";
+
+                if ($isDryRun) {
+                    $this->line("   📝 [DRY-RUN] {$fileName}: {$filePath}");
+                    continue;
+                }
+
+                if (!$this->option('force') && File::exists($filePath)) {
+                    $this->warn("   ⚠️  {$fileName} 檔案已存在");
+                    continue;
+                }
+
+                File::put($filePath, $template);
+                $this->info("   ✅ {$fileName}");
+            }
+        }
     }
 }
