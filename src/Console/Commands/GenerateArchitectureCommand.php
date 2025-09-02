@@ -583,11 +583,16 @@ class GenerateArchitectureCommand extends Command
 
         $content = str_replace('{{ModelName}}', $modelName, $template);
 
-        $filePath = app_path("Http/Controllers/{$modelName}Controller.php");
+        $dirPath = app_path("Http/Controllers/API");
+        $filePath = "{$dirPath}/{$modelName}Controller.php";
 
         if ($isDryRun) {
             $this->line("   📝 [DRY-RUN] Controller: {$filePath}");
             return;
+        }
+
+        if (!File::isDirectory($dirPath)) {
+            File::makeDirectory($dirPath, 0755, true);
         }
 
         if (!$this->option('force') && File::exists($filePath)) {
