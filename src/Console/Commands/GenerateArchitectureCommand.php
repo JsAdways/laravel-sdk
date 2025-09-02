@@ -228,7 +228,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateModel($modelName, $tableName, $tableData, $isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/model.stub'));
+        $template = File::get($this->_getStubPath('model.stub'));
 
         // 生成 _schema() 內容
         $schemaRules = $this->_generateSchemaRules($tableData['fields']);
@@ -356,7 +356,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateContract($modelName, $isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/contract.stub'));
+        $template = File::get($this->_getStubPath('contract.stub'));
 
         $content = str_replace('{{ModelName}}', $modelName, $template);
 
@@ -392,7 +392,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateCreateDto($modelName, $tableData, $isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/create-dto.stub'));
+        $template = File::get($this->_getStubPath('create-dto.stub'));
 
         $properties = $this->_generateDtoProperties($tableData['fields'], false);
         $relationArrays = $this->_generateCreateDtoRelationArrays($modelName);
@@ -433,7 +433,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateUpdateDto($modelName, $tableData, $isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/update-dto.stub'));
+        $template = File::get($this->_getStubPath('update-dto.stub'));
 
         $properties = $this->_generateDtoProperties($tableData['fields'], true);
         $relationArrays = $this->_generateUpdateDtoRelationArrays($modelName);
@@ -552,7 +552,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateRepository($modelName, $isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/repository.stub'));
+        $template = File::get($this->_getStubPath('repository.stub'));
 
         $content = str_replace('{{ModelName}}', $modelName, $template);
 
@@ -574,7 +574,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateController($modelName, $isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/controller.stub'));
+        $template = File::get($this->_getStubPath('controller.stub'));
 
         $content = str_replace('{{ModelName}}', $modelName, $template);
 
@@ -611,7 +611,7 @@ class GenerateArchitectureCommand extends Command
             $routes[] = "";
         }
 
-        $template = File::get(resource_path('stubs/routes.stub'));
+        $template = File::get($this->_getStubPath('routes.stub'));
         $useStatements = $this->_generateControllerUseStatements();
 
         $content = str_replace([
@@ -658,7 +658,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateBaseException($isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/base-exception.stub'));
+        $template = File::get($this->_getStubPath('base-exception.stub'));
         $filePath = app_path('Exceptions/BaseException.php');
 
         if ($isDryRun) {
@@ -681,7 +681,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateExceptionHandler($isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/exception-handler.stub'));
+        $template = File::get($this->_getStubPath('exception-handler.stub'));
         $filePath = app_path('Exceptions/Handler.php');
 
         if ($isDryRun) {
@@ -718,7 +718,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateBaseService($isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/base-service.stub'));
+        $template = File::get($this->_getStubPath('base-service.stub'));
         $filePath = app_path('Services/Service.php');
 
         if ($isDryRun) {
@@ -741,7 +741,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateConfigService($isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/config-service.stub'));
+        $template = File::get($this->_getStubPath('config-service.stub'));
         $dirPath = app_path('Services/Config');
         $filePath = "{$dirPath}/ConfigService.php";
 
@@ -778,7 +778,7 @@ class GenerateArchitectureCommand extends Command
             }
 
             foreach ($serviceFiles as $serviceFile) {
-                $template = File::get(resource_path("stubs/{$serviceFile}.stub"));
+                $template = File::get($this->_getStubPath("{$serviceFile}.stub"));
                 $filePath = "{$dirPath}/{$serviceFile}.php";
 
                 if ($isDryRun) {
@@ -799,7 +799,7 @@ class GenerateArchitectureCommand extends Command
 
     protected function _generateInternalService($isDryRun = false)
     {
-        $template = File::get(resource_path('stubs/internal-service.stub'));
+        $template = File::get($this->_getStubPath('internal-service.stub'));
         $dirPath = app_path('Services/Internal');
         $filePath = "{$dirPath}/InternalService.php";
 
@@ -866,7 +866,7 @@ class GenerateArchitectureCommand extends Command
             }
 
             foreach ($files as $fileName => $stubFile) {
-                $template = File::get(resource_path("stubs/{$stubFile}"));
+                $template = File::get($this->_getStubPath("{$stubFile}"));
                 $filePath = "{$dirPath}/{$fileName}.php";
 
                 if ($isDryRun) {
@@ -883,5 +883,11 @@ class GenerateArchitectureCommand extends Command
                 $this->info("   ✅ {$fileName}");
             }
         }
+    }
+
+    protected function _getStubPath($stubName): string
+    {
+        // 從 Command 檔案位置向上兩層到套件根目錄，然後進入 resources/stubs
+        return __DIR__ . '/../../resources/stubs/' . $stubName;
     }
 }
