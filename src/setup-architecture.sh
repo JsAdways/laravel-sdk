@@ -13,7 +13,7 @@ fi
 echo "📁 建立必要目錄結構..."
 
 # 建立核心目錄
-mkdir -p app/Core/{Contracts,Controllers,Enums,Repositories,Services}
+mkdir -p app/Core/{Contracts,Controllers,Enums,Repositories,Services,Pickers}
 mkdir -p app/{Exceptions,Repositories,Services}
 mkdir -p resources/stubs
 
