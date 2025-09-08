@@ -73,6 +73,20 @@ class Repository extends BaseRepository
 }
 EOF
 
+# 建立基底 Picker（強制覆蓋）
+cat > app/Core/Pickers/BasePicker.php << 'EOF'
+<?php
+
+namespace App\Core\Pickers;
+
+use Jsadways\LaravelSDK\Http\Requests\Server\Picker\BasePicker as Pickers;
+
+class BasePicker extends Pickers
+{
+
+}
+EOF
+
 # 更新 Controller（強制覆蓋）
 cat > app/Http/Controllers/Controller.php << 'EOF'
 <?php
