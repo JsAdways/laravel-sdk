@@ -79,6 +79,7 @@ class FileHandleService extends Service implements FileHandleContract
                 $info = pathinfo($stored_path);
 
                 $result[] = [
+                    'file_key' => $file_key,
                     'dir' => $info['dirname'],
                     'name' => $info['basename'],
                     'org_name' => $org_name,
