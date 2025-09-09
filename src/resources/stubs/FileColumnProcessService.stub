@@ -174,20 +174,15 @@ class FileColumnProcessService extends Service implements FileColumnProcessContr
 
     protected function _model_get_relations(ReflectionClass $model_class): array
     {
-        return array_keys(array_reduce(
-            $model_class->getMethods(ReflectionMethod::IS_PUBLIC),
-            function ($result, ReflectionMethod $method) {
-                // If this function has a return type
-                ($returnType = (string) $method->getReturnType()) &&
+        $methods = $model_class->getMethods(ReflectionMethod::IS_PUBLIC);
+        return array_keys(array_reduce($methods,function ($result, ReflectionMethod $method){
+            $returnType = (string) $method->getReturnType();
 
-                // And this function returns a relation
-                is_subclass_of($returnType, Relation::class) &&
+            if(is_subclass_of($returnType, Relation::class) && (str_ends_with($returnType, 'HasMany') || str_ends_with($returnType, 'HasOne'))){
+                $result = array_merge($result, [$method->getName() => $returnType]);
+            }
 
-                // Add name of this method to the relations array
-                ($result = array_merge($result, [$method->getName() => $returnType]));
-
-                return $result;
-            }, []
-        ));
+            return $result;
+        },[]));
     }
 }
