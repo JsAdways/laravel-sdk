@@ -19,9 +19,13 @@ class FileHandleService extends Service implements FileHandleContract
     private int $file_cache_ttl = 60;
     public function __construct(protected ImageProcessService $imageProcessService){}
 
-    public function classify(array $files_in_db,array $files): FileClassifyDto
+    public function classify(array $files_in_db,string|array $files): FileClassifyDto
     {
         // TODO: Implement classify() method.
+        if(!is_array($files))
+        {
+            $files = [$files];
+        }
         $files = collect($files);
         $files_in_db = collect($files_in_db);
         $files_to_create = $files->filter(function ($file){
@@ -101,7 +105,9 @@ class FileHandleService extends Service implements FileHandleContract
     {
         // TODO: Implement delete() method.
         foreach ($files as $file) {
-            Storage::delete($file);
+            if($file !== null){
+                Storage::delete($file);
+            }
         }
     }
 
