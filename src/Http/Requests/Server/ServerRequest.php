@@ -73,7 +73,7 @@ class ServerRequest extends FormRequest
 
     public function validate(array $rules, ...$params): array
     {
-        $validate_result = parent::validate($rules, $params);
+        $validate_result = parent::validate($rules, ...$params);
 
         $this->validated_data = (new ValidateEnums())->replace(
             payload: $validate_result,
